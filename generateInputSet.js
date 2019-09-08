@@ -1289,48 +1289,77 @@ function runMain(){
 
     async.eachSeries(DEFAULT_INPUT_TYPES, function(type, cb){
 
+      if (type === "sentiment"){
 
-      const folder = defaultHistogramsFolder + "/types/" + type;
-      const file = "histograms_" + type + ".json";
+        // │  │  ├─ numInputs: 9
+        // │  │  ├─ underMinNumInputs
+        // │  │  ├─ overMaxNumInputs
+        // │  │  ├─ currentMaxNumInputs: 0
+        // │  │  ├─ totalInputs: 26
+        // │  │  ├─ minDominantMin: 0.7125
+        // │  │  ├─ minTotalMin: 10
+        // │  │  ├─ lessThanMin: 0
+        // │  │  ├─ moreThanMin: 26
+        // │  │  └─ totalMin: 0
 
-      const minTotalMin = (genInParams.minTotalMin[type] && (genInParams.minTotalMin[type] !== undefined)) ? genInParams.minTotalMin[type] : configuration.minTotalMin;
+        globalInputsObj.inputs[type] = {};
+        // globalInputsObj.inputs[type] = inputsObj.inputs[type];
+        globalInputsObj.meta.type[type] = {};
+        // globalInputsObj.meta.type[type] = inputsObj.meta.type[type];
+        globalInputsObj.meta.type[type].numInputs = 3;
+        globalInputsObj.meta.type[type].underMinNumInputs = 0;
+        globalInputsObj.meta.type[type].overMaxNumInputs = 0;
+        globalInputsObj.meta.type[type].currentMaxNumInputs = 0;
+        globalInputsObj.meta.type[type].totalInputs = 3;
+        globalInputsObj.meta.type[type].minDominantMin = genInParams.minDominantMin[type];
+        globalInputsObj.meta.type[type].minTotalMin = 1;
+        globalInputsObj.meta.type[type].lessThanMin = 0;
+        globalInputsObj.meta.type[type].moreThanMin = 3;
+        globalInputsObj.meta.type[type].totalMin = 1;
+        cb();
+      }
+      else{
+        const folder = defaultHistogramsFolder + "/types/" + type;
+        const file = "histograms_" + type + ".json";
 
-      loadStream({folder: folder, file: file, minTotalMin})
-      .then(function(results){
-        console.log(chalkBlue("\nGIS | +++ LOADED HISTOGRAM | " + type.toUpperCase()
-          + "\nGIS | TOTAL ITEMS:          " + results.totalInputs
-          + "\nGIS | MAX TOT CAT:          " + results.maxTotalCategorized
-          + "\nGIS | MIN TOTAL MIN:        " + minTotalMin
-          + "\nGIS | MORE THAN TOTAL MIN:  " + results.moreThanMin + " (" + (100*results.moreThanMin/results.totalInputs).toFixed(2) + "%)"
-          + "\nGIS | LESS THAN TOTAL MIN:  " + results.lessThanMin + " (" + (100*results.lessThanMin/results.totalInputs).toFixed(2) + "%)"
-        ));
+        const minTotalMin = (genInParams.minTotalMin[type] && (genInParams.minTotalMin[type] !== undefined)) ? genInParams.minTotalMin[type] : configuration.minTotalMin;
 
-        genInParams.histogramsObj.histograms[type] = {};
-        genInParams.histogramsObj.histograms[type] = results.obj;
+        loadStream({folder: folder, file: file, minTotalMin})
+        .then(function(results){
+          console.log(chalkBlue("\nGIS | +++ LOADED HISTOGRAM | " + type.toUpperCase()
+            + "\nGIS | TOTAL ITEMS:          " + results.totalInputs
+            + "\nGIS | MAX TOT CAT:          " + results.maxTotalCategorized
+            + "\nGIS | MIN TOTAL MIN:        " + minTotalMin
+            + "\nGIS | MORE THAN TOTAL MIN:  " + results.moreThanMin + " (" + (100*results.moreThanMin/results.totalInputs).toFixed(2) + "%)"
+            + "\nGIS | LESS THAN TOTAL MIN:  " + results.lessThanMin + " (" + (100*results.lessThanMin/results.totalInputs).toFixed(2) + "%)"
+          ));
 
-        generateInputSets(genInParams)
-        .then(function(inputsObj){
-          globalInputsObj.inputs[type] = {};
-          globalInputsObj.inputs[type] = inputsObj.inputs[type];
-          globalInputsObj.meta.type[type] = {};
-          globalInputsObj.meta.type[type] = inputsObj.meta.type[type];
-          globalInputsObj.meta.type[type].totalInputs = results.totalInputs;
-          globalInputsObj.meta.type[type].minDominantMin = genInParams.minDominantMin[type];
-          globalInputsObj.meta.type[type].minTotalMin = minTotalMin;
-          globalInputsObj.meta.type[type].lessThanMin = results.lessThanMin;
-          globalInputsObj.meta.type[type].moreThanMin = results.moreThanMin;
-          globalInputsObj.meta.type[type].totalMin = globalInputsObj.meta.type[type].totalMin || 0;
-          cb();
+          genInParams.histogramsObj.histograms[type] = {};
+          genInParams.histogramsObj.histograms[type] = results.obj;
+
+          generateInputSets(genInParams)
+          .then(function(inputsObj){
+            globalInputsObj.inputs[type] = {};
+            globalInputsObj.inputs[type] = inputsObj.inputs[type];
+            globalInputsObj.meta.type[type] = {};
+            globalInputsObj.meta.type[type] = inputsObj.meta.type[type];
+            globalInputsObj.meta.type[type].totalInputs = results.totalInputs;
+            globalInputsObj.meta.type[type].minDominantMin = genInParams.minDominantMin[type];
+            globalInputsObj.meta.type[type].minTotalMin = minTotalMin;
+            globalInputsObj.meta.type[type].lessThanMin = results.lessThanMin;
+            globalInputsObj.meta.type[type].moreThanMin = results.moreThanMin;
+            globalInputsObj.meta.type[type].totalMin = globalInputsObj.meta.type[type].totalMin || 0;
+            cb();
+          })
+          .catch(function(err){
+            return cb(err);
+          })
         })
         .catch(function(err){
-          return cb(err);
-        })
-
-      })
-      .catch(function(err){
-        console.log(chalkError("GIS | LOAD HISTOGRAMS / GENERATE INPUT SETS ERROR: " + err));
-        cb(err);
-      });
+          console.log(chalkError("GIS | LOAD HISTOGRAMS / GENERATE INPUT SETS ERROR: " + err));
+          cb(err);
+        });
+      }
 
     }, function(err){
 
