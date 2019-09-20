@@ -1257,29 +1257,29 @@ function runMain(){
 
     genInParams.minTotalMin = {};
     genInParams.minTotalMin.emoji = 5;
-    genInParams.minTotalMin.friends = 1800;
-    genInParams.minTotalMin.hashtags = 16;
-    genInParams.minTotalMin.images = 12;
+    genInParams.minTotalMin.friends = 1500;
+    genInParams.minTotalMin.hashtags = 10;
+    genInParams.minTotalMin.images = 10;
     genInParams.minTotalMin.locations = configuration.minTotalMin;
     genInParams.minTotalMin.media = configuration.minTotalMin;
     genInParams.minTotalMin.places = configuration.minTotalMin;
     genInParams.minTotalMin.sentiment = configuration.minTotalMin;
-    genInParams.minTotalMin.urls = 15;
-    genInParams.minTotalMin.userMentions = 25;
-    genInParams.minTotalMin.words = 7;
+    genInParams.minTotalMin.urls = 10;
+    genInParams.minTotalMin.userMentions = 20;
+    genInParams.minTotalMin.words = 5;
 
     genInParams.minDominantMin = {};
-    genInParams.minDominantMin.emoji = 0.775;
-    genInParams.minDominantMin.friends = 0.75;
-    genInParams.minDominantMin.hashtags = 1;
-    genInParams.minDominantMin.images = 0.9;
-    genInParams.minDominantMin.locations = 0.7;
-    genInParams.minDominantMin.media = 0.725;
-    genInParams.minDominantMin.places = 0.7125;
-    genInParams.minDominantMin.sentiment = 0.01;
-    genInParams.minDominantMin.urls = 1;
-    genInParams.minDominantMin.userMentions = 0.95;
-    genInParams.minDominantMin.words = 0.875;
+    genInParams.minDominantMin.emoji = configuration.minDominantMin;
+    genInParams.minDominantMin.friends = configuration.minDominantMin;
+    genInParams.minDominantMin.hashtags = configuration.minDominantMin;
+    genInParams.minDominantMin.images = configuration.minDominantMin;
+    genInParams.minDominantMin.locations = configuration.minDominantMin;
+    genInParams.minDominantMin.media = configuration.minDominantMin;
+    genInParams.minDominantMin.places = configuration.minDominantMin;
+    genInParams.minDominantMin.sentiment = configuration.minDominantMin;
+    genInParams.minDominantMin.urls = configuration.minDominantMin;
+    genInParams.minDominantMin.userMentions = configuration.minDominantMin;
+    genInParams.minDominantMin.words = configuration.minDominantMin;
 
     genInParams.histogramsObj = {};
     genInParams.histogramsObj.histograms = {};
