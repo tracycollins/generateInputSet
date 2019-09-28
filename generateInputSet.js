@@ -1256,17 +1256,17 @@ function runMain(){
     const genInParams = {};
 
     genInParams.minTotalMin = {};
-    genInParams.minTotalMin.emoji = 5;
-    genInParams.minTotalMin.friends = 1500;
-    genInParams.minTotalMin.hashtags = 10;
-    genInParams.minTotalMin.images = 10;
-    genInParams.minTotalMin.locations = configuration.minTotalMin;
+    genInParams.minTotalMin.emoji = 50;
+    genInParams.minTotalMin.friends = 6900;
+    genInParams.minTotalMin.hashtags = 50;
+    genInParams.minTotalMin.images = 480;
+    genInParams.minTotalMin.locations = 20;
     genInParams.minTotalMin.media = configuration.minTotalMin;
     genInParams.minTotalMin.places = configuration.minTotalMin;
     genInParams.minTotalMin.sentiment = configuration.minTotalMin;
-    genInParams.minTotalMin.urls = 10;
-    genInParams.minTotalMin.userMentions = 20;
-    genInParams.minTotalMin.words = 5;
+    genInParams.minTotalMin.urls = 5;
+    genInParams.minTotalMin.userMentions = 70;
+    genInParams.minTotalMin.words = 950;
 
     genInParams.minDominantMin = {};
     genInParams.minDominantMin.emoji = configuration.minDominantMin;
