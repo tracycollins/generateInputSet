@@ -55,6 +55,8 @@ configuration.maxNumInputsPerType = DEFAULT_MAX_NUM_INPUTS_PER_TYPE;
 configuration.keepaliveInterval = Number(ONE_MINUTE)+1;
 configuration.quitOnComplete = true;
 
+const wordAssoDb = require("@threeceelabs/mongoose-twitter");
+
 const tcuChildName = MODULE_ID_PREFIX + "_TCU";
 const ThreeceeUtilities = require("@threeceelabs/threecee-utilities");
 const tcUtils = new ThreeceeUtilities(tcuChildName);
@@ -83,16 +85,6 @@ const DEFAULT_INPUT_TYPES = [
 
 DEFAULT_INPUT_TYPES.sort();
 
-global.dbConnection = false;
-const mongoose = require("mongoose");
-mongoose.Promise = global.Promise;
-mongoose.set("useFindAndModify", false);
-
-const wordAssoDb = require("@threeceelabs/mongoose-twitter");
-
-const networkInputsModel = require("@threeceelabs/mongoose-twitter/models/networkInputs.server.model");
-let NetworkInputs;
-
 const compactDateTimeFormat = "YYYYMMDD_HHmmss";
 
 const INIT_DOM_MIN = 0.999999;
@@ -115,6 +107,7 @@ const table = require("text-table");
 
 const chalk = require("chalk");
 const chalkBlue = chalk.blue;
+const chalkBlueBold = chalk.blue.bold;
 const chalkError = chalk.bold.red;
 const chalkAlert = chalk.red;
 const chalkLog = chalk.gray;
@@ -728,45 +721,48 @@ function getTimeStamp(inputTime) {
   }
 }
 
-function connectDb(){
+async function connectDb(){
 
-  return new Promise(function(resolve, reject){
+  try {
 
-    statsObj.status = "CONNECT DB";
+    statsObj.status = "CONNECTING MONGO DB";
 
-    wordAssoDb.connect("GIS_" + process.pid, function(err, db){
-      if (err) {
-        console.log(chalkError("*** GIS | MONGO DB CONNECTION ERROR: " + err));
-        return reject(err);
-      }
+    console.log(chalkBlueBold(MODULE_ID_PREFIX + " | CONNECT MONGO DB ..."));
 
-      db.on("close", function(){
-        statsObj.status = "MONGO CONNECTION CLOSED";
-        console.error.bind(console, "*** GIS | MONGO DB CONNECTION CLOSED ***\n");
-        console.log(chalkError("*** GIS | MONGO DB CONNECTION CLOSED ***\n"));
-      });
+    const db = await wordAssoDb.connect(MODULE_ID_PREFIX + "_" + process.pid);
 
-      db.on("error", function(){
-        statsObj.status = "MONGO CONNECTION ERROR";
-        console.error.bind(console, "*** GIS | MONGO DB CONNECTION ERROR ***\n");
-        console.log(chalkError("*** GIS | MONGO DB CONNECTION ERROR ***\n"));
-      });
-
-      db.on("disconnected", function(){
-        statsObj.status = "MONGO DISCONNECTED";
-        console.error.bind(console, "*** GIS | MONGO DB DISCONNECTED ***\n");
-        console.log(chalkAlert("*** GIS | MONGO DB DISCONNECTED ***\n"));
-      });
-
-      console.log(chalkBlue("GIS | MONGOOSE DEFAULT CONNECTION OPEN"));
-
-      NetworkInputs = mongoose.model("NetworkInputs", networkInputsModel.NetworkInputsSchema);
-
-      resolve(db);
-
+    db.on("error", async function(err){
+      statsObj.status = "MONGO ERROR";
+      statsObj.dbConnectionReady = false;
+      console.log(chalkError(MODULE_ID_PREFIX + " | *** MONGO DB CONNECTION ERROR"));
+      db.close();
+      quit({cause: "MONGO DB ERROR: " + err});
     });
 
-  });
+    db.on("close", async function(err){
+      statsObj.status = "MONGO CLOSED";
+      statsObj.dbConnectionReady = false;
+      console.log(chalkError(MODULE_ID_PREFIX + " | *** MONGO DB CONNECTION CLOSED"));
+      quit({cause: "MONGO DB CLOSED: " + err});
+    });
+
+    db.on("disconnected", async function(){
+      statsObj.status = "MONGO DISCONNECTED";
+      statsObj.dbConnectionReady = false;
+      console.log(chalkAlert(MODULE_ID_PREFIX + " | *** MONGO DB DISCONNECTED"));
+      quit({cause: "MONGO DB DISCONNECTED"});
+    });
+
+    console.log(chalk.green(MODULE_ID_PREFIX + " | MONGOOSE DEFAULT CONNECTION OPEN"));
+
+    statsObj.dbConnectionReady = true;
+
+    return db;
+  }
+  catch(err){
+    console.log(chalkError(MODULE_ID_PREFIX + " | *** MONGO DB CONNECT ERROR: " + err));
+    throw err;
+  }
 }
 
 function getElapsedTimeStamp(){
@@ -1421,7 +1417,7 @@ function runMain(){
           + "_" + process.pid;
 
 
-        const networkInputsDoc = new NetworkInputs(globalInputsObj);
+        const networkInputsDoc = new wordAssoDb.NetworkInputs(globalInputsObj);
 
         networkInputsDoc.save(async function(err, savedNetworkInputsDoc){
 
