@@ -1297,7 +1297,7 @@ function runMain(){
         // │  │  ├─ moreThanMin: 26
         // │  │  └─ totalMin: 0
 
-        globalInputsObj.inputs[type] = {};
+        globalInputsObj.inputs[type] = ["comp", "magnitude", "score"];
         // globalInputsObj.inputs[type] = inputsObj.inputs[type];
         globalInputsObj.meta.type[type] = {};
         // globalInputsObj.meta.type[type] = inputsObj.meta.type[type];
