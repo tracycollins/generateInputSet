@@ -27,7 +27,7 @@ const DEFAULT_INPUTS_FILE_PREFIX = "inputs";
 
 const DEFAULT_MIN_DOM_MIN = 0.375;
 
-const DEFAULT_MIN_TOTAL_MIN = 5;
+const DEFAULT_MIN_TOTAL_MIN = 3;
 
 const DEFAULT_MIN_INPUTS_GENERATED = 1500;
 const DEFAULT_MAX_INPUTS_GENERATED = 2000;
@@ -1251,17 +1251,17 @@ function runMain(){
     const genInParams = {};
 
     genInParams.minTotalMin = {};
-    genInParams.minTotalMin.emoji = 50;
-    genInParams.minTotalMin.friends = 6900;
-    genInParams.minTotalMin.hashtags = 50;
-    genInParams.minTotalMin.images = 480;
-    genInParams.minTotalMin.locations = 20;
+    genInParams.minTotalMin.emoji = 75;
+    genInParams.minTotalMin.friends = 15750;
+    genInParams.minTotalMin.hashtags = 75;
+    genInParams.minTotalMin.images = 1000;
+    genInParams.minTotalMin.locations = 40;
     genInParams.minTotalMin.media = configuration.minTotalMin;
     genInParams.minTotalMin.places = configuration.minTotalMin;
     genInParams.minTotalMin.sentiment = configuration.minTotalMin;
-    genInParams.minTotalMin.urls = 5;
+    genInParams.minTotalMin.urls = configuration.minTotalMin;
     genInParams.minTotalMin.userMentions = 70;
-    genInParams.minTotalMin.words = 950;
+    genInParams.minTotalMin.words = 1300;
 
     genInParams.minDominantMin = {};
     genInParams.minDominantMin.emoji = configuration.minDominantMin;
