@@ -15,7 +15,8 @@ const MODULE_NAME = "generateInputSets";
 const MODULE_ID_PREFIX = "GIS";
 const MODULE_ID = MODULE_ID_PREFIX + "_node_" + hostname;
 
- const DEFAULT_VERBOSE_MODE = false;
+const DEFAULT_USER_PROFILE_ONLY_FLAG = false;
+const DEFAULT_VERBOSE_MODE = false;
 
 const ONE_SECOND = 1000;
 const ONE_MINUTE = ONE_SECOND*60;
@@ -40,6 +41,7 @@ configuration.verbose = DEFAULT_VERBOSE_MODE;
 
 configuration.inputsFilePrefix = DEFAULT_INPUTS_FILE_PREFIX;
 
+configuration.userProfileOnlyFlag = DEFAULT_USER_PROFILE_ONLY_FLAG;
 configuration.testMode = GLOBAL_TEST_MODE;
 configuration.statsUpdateIntervalTime = STATS_UPDATE_INTERVAL;
 
@@ -74,7 +76,7 @@ const DEFAULT_INPUT_TYPES = [
   "images", 
   "locations", 
   "media", 
-  "mentions", 
+  // "mentions", 
   "places", 
   "sentiment", 
   "urls", 
@@ -83,6 +85,21 @@ const DEFAULT_INPUT_TYPES = [
 ];
 
 DEFAULT_INPUT_TYPES.sort();
+
+const USER_PROFILE_INPUT_TYPES = [
+  "emoji",
+  "hashtags",  
+  "images", 
+  "locations", 
+  // "mentions", 
+  "places", 
+  "sentiment", 
+  "urls", 
+  "userMentions", 
+  "words"
+];
+
+USER_PROFILE_INPUT_TYPES.sort();
 
 const compactDateTimeFormat = "YYYYMMDD_HHmmss";
 
@@ -408,10 +425,10 @@ statsObj.numLangAnalyzed = 0;
 
 const histograms = {};
 
-DEFAULT_INPUT_TYPES.forEach(function(type){
-  statsObj.histograms[type] = {};
-  histograms[type] = {};
-});
+// inputTypes.forEach(function(type){
+//   statsObj.histograms[type] = {};
+//   histograms[type] = {};
+// });
 
 let statsUpdateInterval;
 
@@ -944,6 +961,12 @@ async function loadConfigFile(params) {
     }
 
     console.log(chalkInfo(MODULE_ID_PREFIX + " | LOADED CONFIG FILE: " + params.file + "\n" + jsonPrint(loadedConfigObj)));
+
+      if (loadedConfigObj.GIS_USER_PROFILE_ONLY_FLAG !== undefined){
+        console.log("GIS | LOADED GIS_USER_PROFILE_ONLY_FLAG: " + loadedConfigObj.GIS_USER_PROFILE_ONLY_FLAG);
+        newConfiguration.userProfileOnlyFlag = loadedConfigObj.GIS_USER_PROFILE_ONLY_FLAG;
+      }
+
       if (loadedConfigObj.GIS_MAX_NUM_INPUTS_PER_TYPE !== undefined){
         console.log("GIS | LOADED GIS_MAX_NUM_INPUTS_PER_TYPE: " + loadedConfigObj.GIS_MAX_NUM_INPUTS_PER_TYPE);
         newConfiguration.maxNumInputsPerType = loadedConfigObj.GIS_MAX_NUM_INPUTS_PER_TYPE;
@@ -1239,7 +1262,6 @@ function loadStream(params){
     });
 
   });
-
 }
 
 function runMain(){
@@ -1282,7 +1304,14 @@ function runMain(){
     genInParams.histogramsObj.histogramParseDominantMin = configuration.histogramParseDominantMin;
     genInParams.histogramsObj.histogramParseTotalMin = configuration.histogramParseTotalMin;
 
-    async.eachSeries(DEFAULT_INPUT_TYPES, function(type, cb){
+    const inputTypes = (configuration.userProfileOnlyFlag) ? USER_PROFILE_INPUT_TYPES : DEFAULT_INPUT_TYPES;
+
+    inputTypes.forEach(function(type){
+      statsObj.histograms[type] = {};
+      histograms[type] = {};
+    });
+
+    async.eachSeries(inputTypes, function(type, cb){
 
       if (type === "sentiment"){
 
@@ -1380,9 +1409,10 @@ function runMain(){
         "GTOT IN"
       ]);
 
+      globalInputsObj.meta.userProfileOnlyFlag = configuration.userProfileOnlyFlag || false;
       globalInputsObj.meta.numInputs = 0;
 
-      async.eachSeries(DEFAULT_INPUT_TYPES, function(type, cb){
+      async.eachSeries(inputTypes, function(type, cb){
 
         if (globalInputsObj.meta.type[type] === undefined) { return cb(); }
 
@@ -1428,7 +1458,7 @@ function runMain(){
           printInputsObj("GIS | +++ SAVED NETWORK INPUTS DB DOCUMENT", savedNetworkInputsDoc);
           console.log(chalk.blue(
               "\nGIS | ========================================================================================="
-            + "\nGIS | INPUTS" 
+            + "\nGIS | INPUTS | USER PROFILE ONLY: " + configuration.userProfileOnlyFlag 
             + "\nGIS | -----------------------------------------------------------------------------------------\n"
             + table(tableArray, { align: ["l", "l", "r", "r", "r", "r", "r"] })
             + "\nGIS | =========================================================================================\n"
