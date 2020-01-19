@@ -1143,6 +1143,7 @@ function loadStream(params){
   return new Promise(function(resolve, reject){
 
     const streamPath = path.join(params.folder, params.file);
+    const userProfileOnlyFlag = params.userProfileOnlyFlag || configuration.userProfileOnlyFlag;
     const minTotalMin = params.minTotalMin || configuration.minTotalMin;
 
     console.log(chalkInfo("GIS | LOAD STREAM | PATH: " + streamPath));
@@ -1163,7 +1164,14 @@ function loadStream(params){
     let totalCategorized = 0;
     let maxTotalCategorized = 0;
 
-    const pipeline = fs.createReadStream(streamPath).pipe(JSONStream.parse("$*.$*.$*"));
+    let pipeline;
+
+    if (userProfileOnlyFlag){
+      pipeline = fs.createReadStream(streamPath).pipe(JSONStream.parse("profileHistograms.$*.$*"));
+    }
+    else{
+      pipeline = fs.createReadStream(streamPath).pipe(JSONStream.parse("histograms.$*.$*"));
+    }
 
     pipeline.on("data", function(obj){
 
@@ -1187,7 +1195,7 @@ function loadStream(params){
 
         moreThanMin += 1;
 
-        debug(chalkLog("GIS | +++ INPUT"
+        debug(chalkLog("GIS | +++ INPUT | PROFILE ONLY: " + userProfileOnlyFlag
           + " [" + moreThanMin + "]"
           + " | " + params.type
           + " | " + obj.key
@@ -1215,11 +1223,11 @@ function loadStream(params){
     });
 
     pipeline.on("header", function(header){
-      console.log("GIS | HEADER: " + jsonPrint(header));
+      console.log("GIS | HEADER");
     });
 
     pipeline.on("footer", function(footer){
-      console.log("GIS | FOOTER: " + jsonPrint(footer));
+      console.log("GIS | FOOTER");
     });
 
     pipeline.on("close", function(){
