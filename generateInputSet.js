@@ -30,6 +30,28 @@ const DEFAULT_MIN_DOM_MIN = 0.375;
 
 const DEFAULT_MIN_TOTAL_MIN = 3;
 
+const DEFAULT_MIN_TOTAL_MIN_TYPE_HASHMAP = {};
+DEFAULT_MIN_TOTAL_MIN_TYPE_HASHMAP.emoji = 75;
+DEFAULT_MIN_TOTAL_MIN_TYPE_HASHMAP.hashtags = 75;
+DEFAULT_MIN_TOTAL_MIN_TYPE_HASHMAP.images = 1000;
+DEFAULT_MIN_TOTAL_MIN_TYPE_HASHMAP.locations = 40;
+DEFAULT_MIN_TOTAL_MIN_TYPE_HASHMAP.places = 3;
+DEFAULT_MIN_TOTAL_MIN_TYPE_HASHMAP.sentiment = 1;
+DEFAULT_MIN_TOTAL_MIN_TYPE_HASHMAP.urls = 3;
+DEFAULT_MIN_TOTAL_MIN_TYPE_HASHMAP.userMentions = 70;
+DEFAULT_MIN_TOTAL_MIN_TYPE_HASHMAP.words = 1300;
+
+const DEFAULT_MIN_TOTAL_MIN_USER_PROFILE_TYPE_HASHMAP = {};
+DEFAULT_MIN_TOTAL_MIN_USER_PROFILE_TYPE_HASHMAP.emoji = 50;
+DEFAULT_MIN_TOTAL_MIN_USER_PROFILE_TYPE_HASHMAP.hashtags = 50;
+DEFAULT_MIN_TOTAL_MIN_USER_PROFILE_TYPE_HASHMAP.images = 750;
+DEFAULT_MIN_TOTAL_MIN_USER_PROFILE_TYPE_HASHMAP.locations = 20;
+DEFAULT_MIN_TOTAL_MIN_USER_PROFILE_TYPE_HASHMAP.places = 1;
+DEFAULT_MIN_TOTAL_MIN_USER_PROFILE_TYPE_HASHMAP.sentiment = 1;
+DEFAULT_MIN_TOTAL_MIN_USER_PROFILE_TYPE_HASHMAP.urls = 1;
+DEFAULT_MIN_TOTAL_MIN_USER_PROFILE_TYPE_HASHMAP.userMentions = 20;
+DEFAULT_MIN_TOTAL_MIN_USER_PROFILE_TYPE_HASHMAP.words = 500;
+
 const DEFAULT_MIN_INPUTS_GENERATED = 1500;
 const DEFAULT_MAX_INPUTS_GENERATED = 2000;
 const DEFAULT_MAX_NUM_INPUTS_PER_TYPE = 200;
@@ -46,6 +68,8 @@ configuration.testMode = GLOBAL_TEST_MODE;
 configuration.statsUpdateIntervalTime = STATS_UPDATE_INTERVAL;
 
 configuration.minTotalMin = DEFAULT_MIN_TOTAL_MIN;
+configuration.minTotalMinHashMap = DEFAULT_MIN_TOTAL_MIN_TYPE_HASHMAP;
+configuration.minTotalMinUserProfileHashMap = DEFAULT_MIN_TOTAL_MIN_USER_PROFILE_TYPE_HASHMAP;
 configuration.minDominantMin = DEFAULT_MIN_DOM_MIN;
 
 configuration.minInputsGenerated = DEFAULT_MIN_INPUTS_GENERATED;
@@ -1002,6 +1026,16 @@ async function loadConfigFile(params) {
         newConfiguration.minTotalMin = loadedConfigObj.GIS_MIN_TOTAL_MIN;
       }
 
+      if (loadedConfigObj.GIS_MIN_TOTAL_MIN_USER_PROFILE_TYPE_HASHMAP !== undefined){
+        console.log("GIS | LOADED GIS_MIN_TOTAL_MIN_USER_PROFILE_TYPE_HASHMAP: " + loadedConfigObj.GIS_MIN_TOTAL_MIN_USER_PROFILE_TYPE_HASHMAP);
+        newConfiguration.minTotalMinUserProfileHashMap = loadedConfigObj.GIS_MIN_TOTAL_MIN_USER_PROFILE_TYPE_HASHMAP;
+      }
+
+      if (loadedConfigObj.GIS_MIN_TOTAL_MIN_TYPE_HASHMAP !== undefined){
+        console.log("GIS | LOADED GIS_MIN_TOTAL_MIN_TYPE_HASHMAP: " + loadedConfigObj.GIS_MIN_TOTAL_MIN_TYPE_HASHMAP);
+        newConfiguration.minTotalMinHashMap = loadedConfigObj.GIS_MIN_TOTAL_MIN_TYPE_HASHMAP;
+      }
+
       // if (loadedConfigObj.GIS_MAX_TOTAL_MIN !== undefined){
       //   console.log("GIS | LOADED GIS_MAX_TOTAL_MIN: " + loadedConfigObj.GIS_MAX_TOTAL_MIN);
       //   newConfiguration.maxTotalMin = loadedConfigObj.GIS_MAX_TOTAL_MIN;
@@ -1281,17 +1315,7 @@ function runMain(){
     const genInParams = {};
 
     genInParams.minTotalMin = {};
-    genInParams.minTotalMin.emoji = 75;
-    genInParams.minTotalMin.friends = 15750;
-    genInParams.minTotalMin.hashtags = 75;
-    genInParams.minTotalMin.images = 1000;
-    genInParams.minTotalMin.locations = 40;
-    genInParams.minTotalMin.media = configuration.minTotalMin;
-    genInParams.minTotalMin.places = configuration.minTotalMin;
-    genInParams.minTotalMin.sentiment = configuration.minTotalMin;
-    genInParams.minTotalMin.urls = configuration.minTotalMin;
-    genInParams.minTotalMin.userMentions = 70;
-    genInParams.minTotalMin.words = 1300;
+    genInParams.minTotalMin = configuration.userProfileOnlyFlag ? configuration.minTotalMinUserProfileHashMap : configuration.minTotalMinHashMap;
 
     genInParams.minDominantMin = {};
     genInParams.minDominantMin.emoji = configuration.minDominantMin;
@@ -1354,7 +1378,7 @@ function runMain(){
         const folder = defaultHistogramsFolder + "/types/" + type;
         const file = "histograms_" + type + ".json";
 
-        const minTotalMin = (genInParams.minTotalMin[type] && (genInParams.minTotalMin[type] !== undefined)) ? genInParams.minTotalMin[type] : configuration.minTotalMin;
+        const minTotalMin = (genInParams.minTotalMin[type] && (genInParams.minTotalMin[type] !== undefined)) ? genInParams.minTotalMin[type] : configuration.minTotalMin[type];
 
         loadStream({folder: folder, file: file, minTotalMin})
         .then(function(results){
