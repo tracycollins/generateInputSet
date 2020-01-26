@@ -984,9 +984,14 @@ async function loadConfigFile(params) {
 
     console.log(chalkInfo(MODULE_ID_PREFIX + " | LOADED CONFIG FILE: " + params.file + "\n" + jsonPrint(loadedConfigObj)));
 
-      if (loadedConfigObj.GIS_USER_PROFILE_ONLY_FLAG !== undefined){
-        console.log("GIS | LOADED GIS_USER_PROFILE_ONLY_FLAG: " + loadedConfigObj.GIS_USER_PROFILE_ONLY_FLAG);
-        newConfiguration.userProfileOnlyFlag = loadedConfigObj.GIS_USER_PROFILE_ONLY_FLAG;
+      if (loadedConfigObj.GIS_USER_PROFILE_ONLY_FLAG !== undefined) {
+        console.log(MODULE_ID_PREFIX + " | LOADED GIS_USER_PROFILE_ONLY_FLAG: " + loadedConfigObj.GIS_USER_PROFILE_ONLY_FLAG);
+        if ((loadedConfigObj.GIS_USER_PROFILE_ONLY_FLAG === true) || (loadedConfigObj.GIS_USER_PROFILE_ONLY_FLAG === "true")) {
+          newConfiguration.userProfileOnlyFlag = true;
+        }
+        if ((loadedConfigObj.GIS_USER_PROFILE_ONLY_FLAG === false) || (loadedConfigObj.GIS_USER_PROFILE_ONLY_FLAG === "false")) {
+          newConfiguration.userProfileOnlyFlag = false;
+        }
       }
 
       if (loadedConfigObj.GIS_MAX_NUM_INPUTS_PER_TYPE !== undefined){
