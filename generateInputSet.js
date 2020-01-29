@@ -33,6 +33,7 @@ const DEFAULT_MIN_TOTAL_MIN = 3;
 const DEFAULT_MIN_TOTAL_MIN_TYPE_HASHMAP = {};
 DEFAULT_MIN_TOTAL_MIN_TYPE_HASHMAP.emoji = 75;
 DEFAULT_MIN_TOTAL_MIN_TYPE_HASHMAP.hashtags = 75;
+DEFAULT_MIN_TOTAL_MIN_TYPE_HASHMAP.ngrams = 10;
 DEFAULT_MIN_TOTAL_MIN_TYPE_HASHMAP.images = 1000;
 DEFAULT_MIN_TOTAL_MIN_TYPE_HASHMAP.locations = 40;
 DEFAULT_MIN_TOTAL_MIN_TYPE_HASHMAP.places = 3;
@@ -44,6 +45,7 @@ DEFAULT_MIN_TOTAL_MIN_TYPE_HASHMAP.words = 1300;
 const DEFAULT_MIN_TOTAL_MIN_USER_PROFILE_TYPE_HASHMAP = {};
 DEFAULT_MIN_TOTAL_MIN_USER_PROFILE_TYPE_HASHMAP.emoji = 50;
 DEFAULT_MIN_TOTAL_MIN_USER_PROFILE_TYPE_HASHMAP.hashtags = 50;
+DEFAULT_MIN_TOTAL_MIN_USER_PROFILE_TYPE_HASHMAP.ngrams = 5;
 DEFAULT_MIN_TOTAL_MIN_USER_PROFILE_TYPE_HASHMAP.images = 750;
 DEFAULT_MIN_TOTAL_MIN_USER_PROFILE_TYPE_HASHMAP.locations = 20;
 DEFAULT_MIN_TOTAL_MIN_USER_PROFILE_TYPE_HASHMAP.places = 1;
@@ -100,6 +102,7 @@ const DEFAULT_INPUT_TYPES = [
   "images", 
   "locations", 
   "media", 
+  "ngrams", 
   "places", 
   "sentiment", 
   "urls", 
@@ -114,6 +117,7 @@ const USER_PROFILE_INPUT_TYPES = [
   "hashtags",  
   "images", 
   "locations", 
+  "ngrams", 
   "places", 
   "sentiment", 
   "urls", 
@@ -1189,7 +1193,8 @@ function loadStream(params){
 
     if (!pathExists) {
       console.log(chalkAlert("GIS | !!! STREAM PATH DOES NOT EXIST ... SKIPPING LOAD: " + streamPath));
-      return reject(new Error("PATH DOES NOT EXIST: " + streamPath));
+      return resolve();
+      // return reject(new Error("PATH DOES NOT EXIST: " + streamPath));
     }
 
     const fileObj = {};
@@ -1259,11 +1264,11 @@ function loadStream(params){
       }
     });
 
-    pipeline.on("header", function(header){
+    pipeline.on("header", function(){
       console.log("GIS | HEADER");
     });
 
-    pipeline.on("footer", function(footer){
+    pipeline.on("footer", function(){
       console.log("GIS | FOOTER");
     });
 
@@ -1327,6 +1332,7 @@ function runMain(){
     genInParams.minDominantMin.images = configuration.minDominantMin;
     genInParams.minDominantMin.locations = configuration.minDominantMin;
     genInParams.minDominantMin.media = configuration.minDominantMin;
+    genInParams.minDominantMin.ngrams = configuration.minDominantMin;
     genInParams.minDominantMin.places = configuration.minDominantMin;
     genInParams.minDominantMin.sentiment = configuration.minDominantMin;
     genInParams.minDominantMin.urls = configuration.minDominantMin;
@@ -1385,6 +1391,11 @@ function runMain(){
 
         loadStream({folder: folder, file: file, minTotalMin})
         .then(function(results){
+
+          if (!results) {
+            return cb();
+          }
+
           console.log(chalkBlue("\nGIS | +++ LOADED HISTOGRAM | " + type.toUpperCase()
             + "\nGIS | TOTAL ITEMS:          " + results.totalInputs
             + "\nGIS | MAX TOT CAT:          " + results.maxTotalCategorized
