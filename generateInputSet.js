@@ -82,7 +82,7 @@ configuration.maxNumInputsPerType = DEFAULT_MAX_NUM_INPUTS_PER_TYPE;
 configuration.keepaliveInterval = Number(ONE_MINUTE)+1;
 configuration.quitOnComplete = true;
 
-const wordAssoDb = require("@threeceelabs/mongoose-twitter");
+global.wordAssoDb = require("@threeceelabs/mongoose-twitter");
 
 const tcuChildName = MODULE_ID_PREFIX + "_TCU";
 const ThreeceeUtilities = require("@threeceelabs/threecee-utilities");
@@ -771,7 +771,7 @@ async function connectDb(){
 
     console.log(chalkBlueBold(MODULE_ID_PREFIX + " | CONNECT MONGO DB ..."));
 
-    const db = await wordAssoDb.connect(MODULE_ID_PREFIX + "_" + process.pid);
+    const db = await global.wordAssoDb.connect(MODULE_ID_PREFIX + "_" + process.pid);
 
     db.on("error", async function(err){
       statsObj.status = "MONGO ERROR";
@@ -1492,7 +1492,7 @@ function runMain(){
           + "_" + process.pid;
 
 
-        const networkInputsDoc = new wordAssoDb.NetworkInputs(globalInputsObj);
+        const networkInputsDoc = new global.wordAssoDb.NetworkInputs(globalInputsObj);
 
         networkInputsDoc.save(async function(err, savedNetworkInputsDoc){
 
