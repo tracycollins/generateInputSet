@@ -15,6 +15,7 @@ const MODULE_NAME = "generateInputSets";
 const MODULE_ID_PREFIX = "GIS";
 const MODULE_ID = MODULE_ID_PREFIX + "_node_" + hostname;
 
+const DEFAULT_GENERATE_BOTH_USER_PROFILE_ONLY_AND_ALL_HISTOGRAMS_INPUTS = true;
 const DEFAULT_USER_PROFILE_ONLY_FLAG = false;
 const DEFAULT_VERBOSE_MODE = false;
 
@@ -65,6 +66,7 @@ configuration.verbose = DEFAULT_VERBOSE_MODE;
 
 configuration.inputsFilePrefix = DEFAULT_INPUTS_FILE_PREFIX;
 
+configuration.generateBothUserProfileOnlyAndAllHistogramsInputs = DEFAULT_GENERATE_BOTH_USER_PROFILE_ONLY_AND_ALL_HISTOGRAMS_INPUTS;
 configuration.userProfileOnlyFlag = DEFAULT_USER_PROFILE_ONLY_FLAG;
 configuration.testMode = GLOBAL_TEST_MODE;
 configuration.statsUpdateIntervalTime = STATS_UPDATE_INTERVAL;
@@ -988,6 +990,17 @@ async function loadConfigFile(params) {
 
     console.log(chalkInfo(MODULE_ID_PREFIX + " | LOADED CONFIG FILE: " + params.file + "\n" + jsonPrint(loadedConfigObj)));
 
+      if (loadedConfigObj.GIS_GENERATE_BOTH_USER_PROFILE_ONLY_AND_ALL_HISTOGRAMS_INPUTS !== undefined) {
+        console.log(MODULE_ID_PREFIX + " | LOADED GIS_GENERATE_BOTH_USER_PROFILE_ONLY_AND_ALL_HISTOGRAMS_INPUTS: " + loadedConfigObj.GIS_GENERATE_BOTH_USER_PROFILE_ONLY_AND_ALL_HISTOGRAMS_INPUTS);
+        if ((loadedConfigObj.GIS_GENERATE_BOTH_USER_PROFILE_ONLY_AND_ALL_HISTOGRAMS_INPUTS === true) || (loadedConfigObj.GIS_GENERATE_BOTH_USER_PROFILE_ONLY_AND_ALL_HISTOGRAMS_INPUTS === "true")) {
+          newConfiguration.generateBothUserProfileOnlyAndAllHistogramsInputs = true;
+          // GIS_USER_PROFILE_ONLY_FLAG and userProfileOnlyFlag will be ignored
+        }
+        if ((loadedConfigObj.GIS_GENERATE_BOTH_USER_PROFILE_ONLY_AND_ALL_HISTOGRAMS_INPUTS === false) || (loadedConfigObj.GIS_GENERATE_BOTH_USER_PROFILE_ONLY_AND_ALL_HISTOGRAMS_INPUTS === "false")) {
+          newConfiguration.generateBothUserProfileOnlyAndAllHistogramsInputs = false;
+        }
+      }
+
       if (loadedConfigObj.GIS_USER_PROFILE_ONLY_FLAG !== undefined) {
         console.log(MODULE_ID_PREFIX + " | LOADED GIS_USER_PROFILE_ONLY_FLAG: " + loadedConfigObj.GIS_USER_PROFILE_ONLY_FLAG);
         if ((loadedConfigObj.GIS_USER_PROFILE_ONLY_FLAG === true) || (loadedConfigObj.GIS_USER_PROFILE_ONLY_FLAG === "true")) {
@@ -1187,7 +1200,11 @@ function loadStream(params){
     const userProfileOnlyFlag = params.userProfileOnlyFlag || configuration.userProfileOnlyFlag;
     const minTotalMin = params.minTotalMin || configuration.minTotalMin;
 
-    console.log(chalkInfo("GIS | LOAD STREAM | PATH: " + streamPath));
+    console.log(chalkInfo("GIS | LOAD STREAM"
+      + " | USER PROFILE ONLY: " + userProfileOnlyFlag
+      + " | MIN TOT MIN: " + minTotalMin
+      + " | PATH: " + streamPath
+    ));
 
     const pathExists = fs.existsSync(streamPath);
 
@@ -1320,6 +1337,14 @@ function runMain(){
 
     statsObj.status = "RUN MAIN";
 
+    console.log(chalkLog("GIS | USER PROFILE HISTOGRAM ONLY: " + configuration.userProfileOnlyFlag));
+
+    console.log(chalkInfo(
+        "\n--------------------------------------------------------"
+      + "\n" + MODULE_ID_PREFIX + " | USER PROFILE HISTOGRAM ONLY: " + configuration.userProfileOnlyFlag
+      + "\n--------------------------------------------------------"
+    ));
+
     const genInParams = {};
 
     genInParams.minTotalMin = {};
@@ -1389,7 +1414,7 @@ function runMain(){
 
         const minTotalMin = (genInParams.minTotalMin[type] && (genInParams.minTotalMin[type] !== undefined)) ? genInParams.minTotalMin[type] : configuration.minTotalMin[type];
 
-        loadStream({folder: folder, file: file, minTotalMin})
+        loadStream({folder: folder, file: file, minTotalMin: minTotalMin})
         .then(function(results){
 
           if (!results) {
@@ -1485,9 +1510,12 @@ function runMain(){
           return reject(err);
         }
 
+        const histogramsUsedString = (globalInputsObj.meta.userProfileOnlyFlag) ? "profile" : "all";
+
         globalInputsObj.inputsId = configuration.inputsFilePrefix 
           + "_" + moment().format(compactDateTimeFormat) 
           + "_" + globalInputsObj.meta.numInputs 
+          + "_" + histogramsUsedString 
           + "_" + hostname 
           + "_" + process.pid;
 
@@ -1554,12 +1582,28 @@ setTimeout(async function(){
     console.log(chalkBlue(
         "\n--------------------------------------------------------"
       + "\n" + MODULE_ID_PREFIX + " | " + configuration.processName 
-      + "\nCONFIGURATION\n" + jsonPrint(configuration)
-      + "--------------------------------------------------------"
+      // + "\nCONFIGURATION\n" + jsonPrint(configuration)
+      + "\n--------------------------------------------------------"
     ));
 
     await connectDb();
-    await runMain();
+
+    if (configuration.generateBothUserProfileOnlyAndAllHistogramsInputs) {
+
+      console.log(chalkAlert(
+          "\n--------------------------------------------------------"
+        + "\n" + MODULE_ID_PREFIX + " | GENERATING BOTH USER PROFILE ONLY + ALL HISTOGRAMS INPUTS"
+        + "\n--------------------------------------------------------"
+      ));
+
+      configuration.userProfileOnlyFlag = true;
+      await runMain();
+      configuration.userProfileOnlyFlag = false;
+      await runMain();
+    }
+    else{
+      await runMain();
+    }
     quit();
 
   }
