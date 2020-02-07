@@ -200,14 +200,13 @@ let slackRtmClient;
 let slackWebClient;
 
 async function slackSendRtmMessage(msg){
-  console.log(chalkBlue("TNN | SLACK RTM | SEND: " + msg));
+  console.log(chalkBlue(MODULE_ID_PREFIX + " | SLACK RTM | SEND: " + msg));
 
   const sendResponse = await slackRtmClient.sendMessage(msg, slackConversationId);
 
-  console.log(chalkLog("TNN | SLACK RTM | >T\n" + jsonPrint(sendResponse)));
+  console.log(chalkLog(MODULE_ID_PREFIX + " | SLACK RTM | >T\n" + jsonPrint(sendResponse)));
   return sendResponse;
 }
-
 
 async function slackSendWebMessage(msgObj){
   const token = msgObj.token || slackOAuthAccessToken;
@@ -229,7 +228,7 @@ async function slackSendWebMessage(msgObj){
     return sendResponse;
   }
   else {
-    console.log(chalkAlert("TNN | SLACK WEB NOT CONFIGURED | SKIPPING SEND SLACK MESSAGE\n" + jsonPrint(message)));
+    console.log(chalkAlert(MODULE_ID_PREFIX + " | SLACK WEB NOT CONFIGURED | SKIPPING SEND SLACK MESSAGE\n" + jsonPrint(message)));
     return;
   }
 }
@@ -239,7 +238,7 @@ function slackMessageHandler(message){
 
     try {
 
-      console.log(chalkInfo("TNN | MESSAGE | " + message.type + " | " + message.text));
+      console.log(chalkInfo(MODULE_ID_PREFIX + " | MESSAGE | " + message.type + " | " + message.text));
 
       if (message.type !== "message") {
         console.log(chalkAlert("Unhandled MESSAGE TYPE: " + message.type));
@@ -296,14 +295,15 @@ function slackMessageHandler(message){
           resolve();
         break;
         case "PING":
-          slackSendWebMessage(hostname + " | TNN | PONG");
+          console.log(chalkInfo("PING"));
+          // slackSendWebMessage(hostname + " | " + MODULE_ID_PREFIX + " | PONG");
           resolve();
         break;
         case "NONE":
           resolve();
         break;
         default:
-          console.log(chalkAlert("TNN | *** UNDEFINED SLACK MESSAGE: " + message.text));
+          console.log(chalkAlert(MODULE_ID_PREFIX + " | *** UNDEFINED SLACK MESSAGE: " + message.text));
           // reject(new Error("UNDEFINED SLACK MESSAGE TYPE: " + message.text));
           resolve({text: "UNDEFINED SLACK MESSAGE", message: message});
       }
@@ -325,7 +325,7 @@ async function initSlackWebClient(){
 
     conversationsListResponse.channels.forEach(async function(channel){
 
-      console.log(chalkLog("TNN | CHANNEL | " + channel.id + " | " + channel.name));
+      console.log(chalkLog(MODULE_ID_PREFIX + " | CHANNEL | " + channel.id + " | " + channel.name));
 
       if (channel.name === slackChannel) {
         configuration.slackChannel = channel;
@@ -356,7 +356,7 @@ async function initSlackWebClient(){
     return;
   }
   catch(err){
-    console.log(chalkError("TNN | *** INIT SLACK WEB CLIENT ERROR: " + err));
+    console.log(chalkError(MODULE_ID_PREFIX + " | *** INIT SLACK WEB CLIENT ERROR: " + err));
     throw err;
   }
 }
@@ -371,22 +371,22 @@ async function initSlackRtmClient(){
   slackRtmClient.on("slack_event", async function(eventType, event){
     switch (eventType) {
       case "pong":
-        debug(chalkLog("TNN | SLACK RTM PONG | " + getTimeStamp() + " | " + event.reply_to));
+        debug(chalkLog(MODULE_ID_PREFIX + " | SLACK RTM PONG | " + getTimeStamp() + " | " + event.reply_to));
       break;
-      default: debug(chalkInfo("TNN | SLACK RTM EVENT | " + getTimeStamp() + " | " + eventType + "\n" + jsonPrint(event)));
+      default: debug(chalkInfo(MODULE_ID_PREFIX + " | SLACK RTM EVENT | " + getTimeStamp() + " | " + eventType + "\n" + jsonPrint(event)));
     }
   });
 
 
   slackRtmClient.on("message", async function(message){
-    if (configuration.verbose) { console.log(chalkLog("TNN | RTM R<\n" + jsonPrint(message))); }
+    if (configuration.verbose) { console.log(chalkLog(MODULE_ID_PREFIX + " | RTM R<\n" + jsonPrint(message))); }
     debug(`TNN | SLACK RTM MESSAGE | R< | CH: ${message.channel} | USER: ${message.user} | ${message.text}`);
 
     try {
       await slackMessageHandler(message);
     }
     catch(err){
-      console.log(chalkError("TNN | *** SLACK RTM MESSAGE ERROR: " + err));
+      console.log(chalkError(MODULE_ID_PREFIX + " | *** SLACK RTM MESSAGE ERROR: " + err));
     }
 
   });
@@ -1530,6 +1530,7 @@ function runMain(){
           }
 
           printInputsObj("GIS | +++ SAVED NETWORK INPUTS DB DOCUMENT", savedNetworkInputsDoc);
+
           console.log(chalk.blue(
               "\nGIS | ========================================================================================="
             + "\nGIS | INPUTS | USER PROFILE ONLY: " + configuration.userProfileOnlyFlag 
@@ -1552,6 +1553,11 @@ function runMain(){
           networkInputsConfigObj.INPUTS_IDS = _.uniq(networkInputsConfigObj.INPUTS_IDS);
 
           await tcUtils.saveFile({folder: configDefaultFolder, file: defaultInputsConfigFile, obj: networkInputsConfigObj});
+
+          let slackText = "\n*GIS | INPUTS*";
+          slackText = slackText + "\n" + globalInputsObj.inputsId;
+
+          await slackSendWebMessage({channel: slackChannel, text: slackText});
 
           resolve();
 
