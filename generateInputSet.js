@@ -15,7 +15,15 @@ const MODULE_NAME = "generateInputSets";
 const MODULE_ID_PREFIX = "GIS";
 const MODULE_ID = MODULE_ID_PREFIX + "_node_" + hostname;
 
-const DEFAULT_GENERATE_BOTH_USER_PROFILE_ONLY_AND_ALL_HISTOGRAMS_INPUTS = true;
+const DEFAULT_GENERATE_BOTH_USER_PROFILE_ONLY_AND_ALL_HISTOGRAMS_INPUTS = false;
+
+const DEFAULT_USER_PROFILE_CHAR_CODES_ONLY_FLAG = true; // for brain.js: uses 255 charsCodes of screenName, name, desc + location strings
+
+const TWITTER_USER_DESCRIPTION_CHARS = 160;
+const TWITTER_USER_LOCATION_CHARS = 30;
+const TWITTER_USER_NAME_CHARS = 50;
+const TWITTER_USER_SCREENNAME_CHARS = 15;
+
 const DEFAULT_USER_PROFILE_ONLY_FLAG = false;
 const DEFAULT_VERBOSE_MODE = false;
 
@@ -65,6 +73,8 @@ let configuration = {};
 configuration.verbose = DEFAULT_VERBOSE_MODE;
 
 configuration.inputsFilePrefix = DEFAULT_INPUTS_FILE_PREFIX;
+
+configuration.generateUserProfileCharsCodesOnlyInputs = DEFAULT_USER_PROFILE_CHAR_CODES_ONLY_FLAG;
 
 configuration.generateBothUserProfileOnlyAndAllHistogramsInputs = DEFAULT_GENERATE_BOTH_USER_PROFILE_ONLY_AND_ALL_HISTOGRAMS_INPUTS;
 configuration.userProfileOnlyFlag = DEFAULT_USER_PROFILE_ONLY_FLAG;
@@ -411,6 +421,8 @@ let stdin;
 const defaultInputsFolder = path.join(configDefaultFolder, "inputs"); 
 const localInputsFolder = path.join(configHostFolder, "inputs"); 
 
+let inFolder = (hostname === PRIMARY_HOST) ? defaultInputsFolder : localInputsFolder;
+
 const defaultHistogramsFolder = path.join(configDefaultFolder, "histograms"); 
 
 const statsFolder = path.join(DROPBOX_ROOT_FOLDER, "stats", hostname); 
@@ -453,11 +465,6 @@ statsObj.numLangAnalyzed = 0;
 
 const histograms = {};
 
-// inputTypes.forEach(function(type){
-//   statsObj.histograms[type] = {};
-//   histograms[type] = {};
-// });
-
 let statsUpdateInterval;
 
 const jsonPrint = function (obj){
@@ -488,7 +495,6 @@ const optionDefinitions = [
   minInputsGenerated,
   maxInputsGenerated,
   minTotalMin, 
-  // maxTotalMin, 
   minDominantMin, 
   maxDominantMin, 
   enableStdin, 
@@ -1331,17 +1337,102 @@ function loadStream(params){
   });
 }
 
+function runUserProfileCharCodes(){
+
+  return new Promise(function(resolve, reject){
+
+    statsObj.status = "RUN USER PROFILE CHAR CODES";
+
+    console.log(chalkInfo(
+        "\n--------------------------------------------------------"
+      + "\n" + MODULE_ID_PREFIX + " | USER PROFILE CHAR CODES ONLY"
+      + "\n--------------------------------------------------------"
+    ));
+
+    globalInputsObj.meta = {};
+    globalInputsObj.meta.userProfileOnlyFlag = false;
+    globalInputsObj.meta.userProfileCharCodesOnlyFlag = true;
+
+    globalInputsObj.meta.userProfileCharCounts = {};
+    globalInputsObj.meta.userProfileCharCounts.description = TWITTER_USER_DESCRIPTION_CHARS;
+    globalInputsObj.meta.userProfileCharCounts.location = TWITTER_USER_LOCATION_CHARS;
+    globalInputsObj.meta.userProfileCharCounts.name = TWITTER_USER_NAME_CHARS;
+    globalInputsObj.meta.userProfileCharCounts.screenName = TWITTER_USER_SCREENNAME_CHARS;
+
+    globalInputsObj.meta.numInputs = TWITTER_USER_DESCRIPTION_CHARS+TWITTER_USER_LOCATION_CHARS+TWITTER_USER_NAME_CHARS+TWITTER_USER_SCREENNAME_CHARS;
+
+    globalInputsObj.inputsId = configuration.inputsFilePrefix 
+      + "_" + moment().format(compactDateTimeFormat) 
+      + "_" + globalInputsObj.meta.numInputs 
+      + "_profilecharcodes"
+      + "_" + hostname 
+      + "_" + process.pid;
+
+    const networkInputsDoc = new global.wordAssoDb.NetworkInputs(globalInputsObj);
+
+    networkInputsDoc.save(async function(err, savedNetworkInputsDoc){
+
+      if (err) {
+        console.log(chalkError("GIS | *** CREATE NETWORK INPUTS DB DOCUMENT: " + err));
+        return reject(err);
+      }
+
+      printInputsObj("GIS | +++ SAVED NETWORK INPUTS DB DOCUMENT", savedNetworkInputsDoc);
+
+      console.log(chalk.blue(
+          "\nGIS | ========================================================================================="
+        + "\nGIS | INPUTS | USER PROFILE CHAR CODES ONLY: " + configuration.generateUserProfileCharsCodesOnlyInputs 
+        + "\nGIS | -----------------------------------------------------------------------------------------\n"
+        + jsonPrint(globalInputsObj.meta)
+        + "\nGIS | =========================================================================================\n"
+      ));
+
+      const inFile = globalInputsObj.inputsId + ".json";
+
+      if (configuration.testMode) { 
+        inFolder += "_test";
+      }
+
+      console.log(chalkInfo("GIS | ... SAVING INPUTS FILE: " + inFolder + "/" + inFile));
+
+      await tcUtils.saveFile({folder: inFolder, file: inFile, obj: globalInputsObj});
+
+      console.log(chalkInfo("GIS | ... UPDATING INPUTS CONFIG FILE: " + configDefaultFolder + "/" + defaultInputsConfigFile));
+
+      const networkInputsConfigObj = await tcUtils.loadFile({folder: configDefaultFolder, file: defaultInputsConfigFile, noErrorNotFound: true });
+
+      networkInputsConfigObj.INPUTS_IDS.push(globalInputsObj.inputsId);
+      networkInputsConfigObj.INPUTS_IDS = _.uniq(networkInputsConfigObj.INPUTS_IDS);
+
+      await tcUtils.saveFile({folder: configDefaultFolder, file: defaultInputsConfigFile, obj: networkInputsConfigObj});
+
+      let slackText = "\n*GIS | INPUTS*";
+      slackText = slackText + "\n" + globalInputsObj.inputsId;
+
+      await slackSendWebMessage({channel: slackChannel, text: slackText});
+
+      resolve();
+
+    });
+
+  });
+}
+
 function runMain(){
 
   return new Promise(function(resolve, reject){
 
     statsObj.status = "RUN MAIN";
 
-    console.log(chalkLog("GIS | USER PROFILE HISTOGRAM ONLY: " + configuration.userProfileOnlyFlag));
-
     console.log(chalkInfo(
         "\n--------------------------------------------------------"
       + "\n" + MODULE_ID_PREFIX + " | USER PROFILE HISTOGRAM ONLY: " + configuration.userProfileOnlyFlag
+      + "\n--------------------------------------------------------"
+    ));
+
+    console.log(chalkInfo(
+        "\n--------------------------------------------------------"
+      + "\n" + MODULE_ID_PREFIX + " | USER DESCRIPTION ONLY: " + configuration.userDescriptionOnlyFlag
       + "\n--------------------------------------------------------"
     ));
 
@@ -1366,7 +1457,6 @@ function runMain(){
 
     genInParams.histogramsObj = {};
     genInParams.histogramsObj.histograms = {};
-    // genInParams.histogramsObj.maxTotalMin = {};
     genInParams.histogramsObj.histogramParseDominantMin = configuration.histogramParseDominantMin;
     genInParams.histogramsObj.histogramParseTotalMin = configuration.histogramParseTotalMin;
 
@@ -1460,12 +1550,6 @@ function runMain(){
 
       if (err) {
         return reject(err);
-      }
-
-      let inFolder = (hostname === PRIMARY_HOST) ? defaultInputsFolder : localInputsFolder;
-
-      if (configuration.testMode) { 
-        inFolder += "_test";
       }
 
       const tableArray = [];
@@ -1594,7 +1678,20 @@ setTimeout(async function(){
 
     await connectDb();
 
-    if (configuration.generateBothUserProfileOnlyAndAllHistogramsInputs) {
+    if (configuration.testMode) { 
+      inFolder += "_test";
+    }
+
+    if (configuration.generateUserProfileCharsCodesOnlyInputs) {
+      console.log(chalkAlert(
+          "\n--------------------------------------------------------"
+        + "\n" + MODULE_ID_PREFIX + " | GENERATING USER PROFILE CHAR CODES ONLY INPUTS"
+        + "\n--------------------------------------------------------"
+      ));
+      await runUserProfileCharCodes();
+      quit();
+    }
+    else if (configuration.generateBothUserProfileOnlyAndAllHistogramsInputs) {
 
       console.log(chalkAlert(
           "\n--------------------------------------------------------"
