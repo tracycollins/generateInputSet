@@ -150,7 +150,6 @@ const path = require("path");
 const merge = require("deepmerge");
 const util = require("util");
 const _ = require("lodash");
-const treeify = require("treeify");
 const dot = require("dot-object");
 
 const async = require("async");
@@ -467,16 +466,17 @@ const histograms = {};
 
 let statsUpdateInterval;
 
-const jsonPrint = function (obj){
-  if (obj) {
-    return treeify.asTree(obj, true, true);
-  }
-  else {
-    return "UNDEFINED";
-  }
-};
+const jsonPrint = tcUtils.jsonPrint;
+const getTimeStamp = tcUtils.getTimeStamp;
 
 const cla = require("command-line-args");
+
+const userProfileCharCodesOnlyFlag = { 
+  name: "userProfileCharCodesOnlyFlag",
+  alias: "C",
+  type: Boolean,
+  defaultValue: false
+};
 
 const minInputsGenerated = { name: "minInputsGenerated", type: Number};
 const maxInputsGenerated = { name: "maxInputsGenerated", type: Number};
@@ -492,6 +492,7 @@ const quitOnError = { name: "quitOnError", alias: "q", type: Boolean, defaultVal
 const testMode = { name: "testMode", alias: "X", type: Boolean, defaultValue: false};
 
 const optionDefinitions = [
+  userProfileCharCodesOnlyFlag,
   minInputsGenerated,
   maxInputsGenerated,
   minTotalMin, 
@@ -750,26 +751,6 @@ process.on( "SIGINT", function() {
   quit("SIGINT");
 });
 
-function getTimeStamp(inputTime) {
-  let currentTimeStamp;
-
-  if (inputTime === undefined) {
-    currentTimeStamp = moment().format(compactDateTimeFormat);
-    return currentTimeStamp;
-  }
-  else if (moment.isMoment(inputTime)) {
-    currentTimeStamp = moment(inputTime).format(compactDateTimeFormat);
-    return currentTimeStamp;
-  }
-  else if (moment.isDate(new Date(inputTime))) {
-    currentTimeStamp = moment(new Date(inputTime)).format(compactDateTimeFormat);
-    return currentTimeStamp;
-  }
-  else {
-    currentTimeStamp = moment(parseInt(inputTime)).format(compactDateTimeFormat);
-    return currentTimeStamp;
-  }
-}
 
 async function connectDb(){
 
@@ -1350,6 +1331,7 @@ function runUserProfileCharCodes(){
     ));
 
     globalInputsObj.meta = {};
+    globalInputsObj.meta.type = {};
     globalInputsObj.meta.userProfileOnlyFlag = false;
     globalInputsObj.meta.userProfileCharCodesOnlyFlag = true;
 
@@ -1367,6 +1349,27 @@ function runUserProfileCharCodes(){
       + "_profilecharcodes"
       + "_" + hostname 
       + "_" + process.pid;
+
+    const userProfileProperties = Object.keys(globalInputsObj.meta.userProfileCharCounts).sort();
+
+    globalInputsObj.inputs = {};
+
+    for (const userProfileProperty of userProfileProperties){
+
+      console.log("TYPE | " + userProfileProperty.toUpperCase() + " | " + globalInputsObj.meta.userProfileCharCounts[userProfileProperty]);
+
+      globalInputsObj.meta.type[userProfileProperty] = {};
+
+      // start with zero inputs of type if more than configuration.minNumInputsPerType
+      globalInputsObj.meta.type[userProfileProperty].numInputs = globalInputsObj.meta.userProfileCharCounts[userProfileProperty];
+
+      globalInputsObj.inputs[userProfileProperty] = [];
+
+      for (let index = 0; index < globalInputsObj.meta.userProfileCharCounts[userProfileProperty]; index++){
+        globalInputsObj.inputs[userProfileProperty].push(userProfileProperty + "_" + index.toString().padStart(3,"0"));
+      }
+
+    }
 
     const networkInputsDoc = new global.wordAssoDb.NetworkInputs(globalInputsObj);
 
