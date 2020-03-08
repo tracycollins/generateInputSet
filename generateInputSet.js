@@ -17,7 +17,7 @@ const MODULE_ID = MODULE_ID_PREFIX + "_node_" + hostname;
 
 const DEFAULT_GENERATE_BOTH_USER_PROFILE_ONLY_AND_ALL_HISTOGRAMS_INPUTS = false;
 
-const DEFAULT_USER_PROFILE_CHAR_CODES_ONLY_FLAG = true; // for brain.js: uses 255 charsCodes of screenName, name, desc + location strings
+const DEFAULT_USER_PROFILE_CHAR_CODES_ONLY_FLAG = false; // for brain.js: uses 255 charsCodes of screenName, name, desc + location strings
 
 const TWITTER_USER_DESCRIPTION_CHARS = 160;
 const TWITTER_USER_LOCATION_CHARS = 30;
