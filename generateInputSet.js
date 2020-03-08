@@ -17,7 +17,7 @@ const MODULE_ID = MODULE_ID_PREFIX + "_node_" + hostname;
 
 const DEFAULT_GENERATE_BOTH_USER_PROFILE_ONLY_AND_ALL_HISTOGRAMS_INPUTS = false;
 
-const DEFAULT_USER_PROFILE_CHAR_CODES_ONLY_FLAG = false; // for brain.js: uses 255 charsCodes of screenName, name, desc + location strings
+const DEFAULT_USER_PROFILE_CHAR_CODES_ONLY_FLAG = true; // for brain.js: uses 255 charsCodes of screenName, name, desc + location strings
 
 const TWITTER_USER_DESCRIPTION_CHARS = 160;
 const TWITTER_USER_LOCATION_CHARS = 30;
@@ -1343,12 +1343,17 @@ function runUserProfileCharCodes(){
 
     globalInputsObj.meta.numInputs = TWITTER_USER_DESCRIPTION_CHARS+TWITTER_USER_LOCATION_CHARS+TWITTER_USER_NAME_CHARS+TWITTER_USER_SCREENNAME_CHARS;
 
+    // globalInputsObj.inputsId = configuration.inputsFilePrefix 
+    //   + "_" + moment().format(compactDateTimeFormat) 
+    //   + "_" + globalInputsObj.meta.numInputs 
+    //   + "_profilecharcodes"
+    //   + "_" + hostname 
+    //   + "_" + process.pid;
+
     globalInputsObj.inputsId = configuration.inputsFilePrefix 
-      + "_" + moment().format(compactDateTimeFormat) 
-      + "_" + globalInputsObj.meta.numInputs 
-      + "_profilecharcodes"
-      + "_" + hostname 
-      + "_" + process.pid;
+      + "_25250101_000000_" 
+      + globalInputsObj.meta.numInputs 
+      + "_profilecharcodes";
 
     const userProfileProperties = Object.keys(globalInputsObj.meta.userProfileCharCounts).sort();
 
