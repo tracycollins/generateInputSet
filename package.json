@@ -5,7 +5,7 @@
   "main": "generateInputSet.js",
   "dependencies": {
     "@slack/client": "^5.0.2",
-    "@threeceelabs/threecee-utilities": "^1.0.255",
+    "@threeceelabs/threecee-utilities": "^1.0.256",
     "JSONStream": "^1.3.5",
     "command-line-args": "^5.1.1",
     "deepmerge": "^4.2.2",
