@@ -80,7 +80,7 @@ const MODULE_NAME = "generateInputSets";
 const MODULE_ID_PREFIX = "GIS";
 const MODULE_ID = MODULE_ID_PREFIX + "_node_" + hostname;
 
-const PRIMARY_HOST = process.env.PRIMARY_HOST || "google";
+const PRIMARY_HOST = process.env.PRIMARY_HOST || "mms3";
 
 
 const DEFAULT_INPUT_TYPES = [
