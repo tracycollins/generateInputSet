@@ -218,27 +218,36 @@ async function slackSendRtmMessage(msg){
 }
 
 async function slackSendWebMessage(msgObj){
-  const token = msgObj.token || slackOAuthAccessToken;
-  const channel = msgObj.channel || configuration.slackChannel.id;
-  const text = msgObj.text || msgObj;
 
-  const message = {
-    token: token, 
-    channel: channel,
-    text: text
-  };
+  try{
+    
+    const token = msgObj.token || slackOAuthAccessToken;
+    const channel = msgObj.channel || configuration.slackChannel.id;
+    const text = msgObj.text || msgObj;
 
-  if (msgObj.attachments !== undefined) {
-    message.attachments = msgObj.attachments;
+    const message = {
+      token: token, 
+      channel: channel,
+      text: text
+    };
+
+    if (msgObj.attachments !== undefined) {
+      message.attachments = msgObj.attachments;
+    }
+
+    if (slackWebClient && slackWebClient !== undefined) {
+      const sendResponse = await slackWebClient.chat.postMessage(message);
+      return sendResponse;
+    }
+    else {
+      console.log(chalkAlert(MODULE_ID_PREFIX + " | SLACK WEB NOT CONFIGURED | SKIPPING SEND SLACK MESSAGE\n" + tcUtils.jsonPrint(message)));
+      return;
+    }
   }
-
-  if (slackWebClient && slackWebClient !== undefined) {
-    const sendResponse = await slackWebClient.chat.postMessage(message);
-    return sendResponse;
-  }
-  else {
-    console.log(chalkAlert(MODULE_ID_PREFIX + " | SLACK WEB NOT CONFIGURED | SKIPPING SEND SLACK MESSAGE\n" + jsonPrint(message)));
-    return;
+  catch(err){
+    console.log(chalkAlert(MODULE_ID_PREFIX + " | *** slackSendWebMessage ERROR: " + err));
+    console.log(chalkAlert(MODULE_ID_PREFIX + " | *** slackSendWebMessage msgObj\n" + tcUtils.jsonPrint(msgObj)));
+    throw err;
   }
 }
 
@@ -1670,8 +1679,8 @@ setTimeout(async function(){
 
     statsObj.status = "START";
 
-    await initSlackRtmClient();
-    await initSlackWebClient();
+    initSlackRtmClient();
+    initSlackWebClient();
 
     if (configuration.testMode) {
       console.log(chalkAlert(MODULE_ID_PREFIX + " | TEST MODE"));
