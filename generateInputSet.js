@@ -105,7 +105,7 @@ const moment = require("moment");
 let defaultConfiguration = {}; // general configuration for TFE
 let hostConfiguration = {}; // host-specific configuration for TFE
 
-const PRIMARY_HOST = process.env.PRIMARY_HOST || "mms3";
+const PRIMARY_HOST = process.env.PRIMARY_HOST || "mms1";
 
 const DEFAULT_INPUT_TYPES = [
   "emoji",
