@@ -1246,10 +1246,10 @@ function loadStream(params){
 
       // totalCategorized = obj.value.total - obj.value.uncategorized;
       totalCategorized = obj.value.total;
-      
+
       maxTotalCategorized = Math.max(maxTotalCategorized, totalCategorized);
 
-      if (totalCategorized >= 0.1*(minTotalMin)) {
+      if (totalCategorized >= minTotalMin) {
 
         moreThanMin += 1;
 
