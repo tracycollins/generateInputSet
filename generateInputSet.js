@@ -107,7 +107,7 @@ let hostConfiguration = {}; // host-specific configuration for TFE
 
 const PRIMARY_HOST = process.env.PRIMARY_HOST || "mms1";
 
-const DEFAULT_INPUT_TYPES = [
+const DEFAULT_TWEETS_INPUT_TYPES = [
   "emoji",
   "friends",
   "hashtags",  
@@ -122,7 +122,7 @@ const DEFAULT_INPUT_TYPES = [
   "words"
 ];
 
-DEFAULT_INPUT_TYPES.sort();
+DEFAULT_TWEETS_INPUT_TYPES.sort();
 
 const USER_PROFILE_INPUT_TYPES = [
   "emoji",
@@ -1219,14 +1219,15 @@ function loadStream(params){
     let totalCategorized = 0;
     let maxTotalCategorized = 0;
 
-    let pipeline;
+    const pipeline = fs.createReadStream(streamPath).pipe(JSONStream.parse("histograms.$*.$*"));
 
-    if (userProfileOnlyFlag){
-      pipeline = fs.createReadStream(streamPath).pipe(JSONStream.parse("profileHistograms.$*.$*"));
-    }
-    else{
-      pipeline = fs.createReadStream(streamPath).pipe(JSONStream.parse("histograms.$*.$*"));
-    }
+    // let pipeline;
+    // if (userProfileOnlyFlag){
+    //   pipeline = fs.createReadStream(streamPath).pipe(JSONStream.parse("profileHistograms.$*.$*"));
+    // }
+    // else{
+    //   pipeline = fs.createReadStream(streamPath).pipe(JSONStream.parse("histograms.$*.$*"));
+    // }
 
     pipeline.on("data", function(obj){
 
@@ -1477,7 +1478,8 @@ function runMain(){
     genInParams.histogramsObj.histogramParseDominantMin = configuration.histogramParseDominantMin;
     genInParams.histogramsObj.histogramParseTotalMin = configuration.histogramParseTotalMin;
 
-    const inputTypes = (configuration.userProfileOnlyFlag) ? USER_PROFILE_INPUT_TYPES : DEFAULT_INPUT_TYPES;
+    const histogramType = (configuration.userProfileOnlyFlag) ? "profile" : "tweets";
+    const inputTypes = (configuration.userProfileOnlyFlag) ? USER_PROFILE_INPUT_TYPES : DEFAULT_TWEETS_INPUT_TYPES;
 
     inputTypes.forEach(function(type){
       statsObj.histograms[type] = {};
@@ -1517,9 +1519,11 @@ function runMain(){
       }
       else{
         const folder = defaultHistogramsFolder + "/types/" + type;
-        const file = "histograms_" + type + ".json";
+        const file = "histograms_" + type + "_" + histogramType + ".json";
 
-        const minTotalMin = (genInParams.minTotalMin[type] && (genInParams.minTotalMin[type] !== undefined)) ? genInParams.minTotalMin[type] : configuration.minTotalMin[type];
+        const minTotalMin = (genInParams.minTotalMin[type] && (genInParams.minTotalMin[type] !== undefined)) 
+          ? genInParams.minTotalMin[type] 
+          : configuration.minTotalMin[type];
 
         loadStream({folder: folder, file: file, minTotalMin: minTotalMin})
         .then(function(results){
@@ -1528,12 +1532,16 @@ function runMain(){
             return cb();
           }
 
-          console.log(chalkBlue("\nGIS | +++ LOADED HISTOGRAM | " + type.toUpperCase()
+          console.log(chalkBlue("\nGIS | +++ LOADED HISTOGRAM"
+            + " | " + histogramType.toUpperCase()
+            + " | " + type.toUpperCase()
             + "\nGIS | TOTAL ITEMS:          " + results.totalInputs
             + "\nGIS | MAX TOT CAT:          " + results.maxTotalCategorized
             + "\nGIS | MIN TOTAL MIN:        " + minTotalMin
-            + "\nGIS | MORE THAN TOTAL MIN:  " + results.moreThanMin + " (" + (100*results.moreThanMin/results.totalInputs).toFixed(2) + "%)"
-            + "\nGIS | LESS THAN TOTAL MIN:  " + results.lessThanMin + " (" + (100*results.lessThanMin/results.totalInputs).toFixed(2) + "%)"
+            + "\nGIS | MORE THAN TOTAL MIN:  " + results.moreThanMin 
+            + " (" + (100*results.moreThanMin/results.totalInputs).toFixed(2) + "%)"
+            + "\nGIS | LESS THAN TOTAL MIN:  " + results.lessThanMin 
+            + " (" + (100*results.lessThanMin/results.totalInputs).toFixed(2) + "%)"
           ));
 
           genInParams.histogramsObj.histograms[type] = {};
