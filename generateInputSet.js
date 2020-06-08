@@ -25,6 +25,7 @@ const TWITTER_USER_NAME_CHARS = 50;
 const TWITTER_USER_SCREENNAME_CHARS = 15;
 
 const DEFAULT_USER_PROFILE_ONLY_FLAG = false;
+const DEFAULT_USER_DESCRIPTION_ONLY_FLAG = false;
 const DEFAULT_VERBOSE_MODE = false;
 
 const ONE_SECOND = 1000;
@@ -77,6 +78,7 @@ configuration.inputsFilePrefix = DEFAULT_INPUTS_FILE_PREFIX;
 configuration.generateUserProfileCharsCodesOnlyInputs = DEFAULT_USER_PROFILE_CHAR_CODES_ONLY_FLAG;
 
 configuration.generateBothUserProfileOnlyAndAllHistogramsInputs = DEFAULT_GENERATE_BOTH_USER_PROFILE_ONLY_AND_ALL_HISTOGRAMS_INPUTS;
+configuration.userDescriptionOnlyFlag = DEFAULT_USER_DESCRIPTION_ONLY_FLAG;
 configuration.userProfileOnlyFlag = DEFAULT_USER_PROFILE_ONLY_FLAG;
 configuration.testMode = GLOBAL_TEST_MODE;
 configuration.statsUpdateIntervalTime = STATS_UPDATE_INTERVAL;
@@ -151,6 +153,7 @@ const merge = require("deepmerge");
 const util = require("util");
 const _ = require("lodash");
 const dot = require("dot-object");
+const defaults = require("object.defaults");
 
 const async = require("async");
 const debug = require("debug")("gis");
@@ -609,6 +612,32 @@ function sortedHashmap(params) {
   });
 }
 
+const entryDefaults = {
+  "total": 0,
+  "left": 0,
+  "leftRatio": 0,
+  "neutral": 0,
+  "neutralRatio": 0,
+  "right": 0,
+  "rightRatio": 0,
+  "positive": 0,
+  "positiveRatio": 0,
+  "negative": 0,
+  "negativeRatio": 0,
+  "none": 0,
+  "uncategorized": 0
+};
+
+const ratioCategories = ["left", "neutral", "right"];
+
+function computeRatios(entry){
+  for(const category of ratioCategories){
+    const catValue = entry[category] || 0;
+    entry[category + "Ratio"] = catValue/entry.total;
+  }
+  return entry;
+}
+
 function generateInputSets(params) {
 
   return new Promise(function(resolve, reject){
@@ -670,13 +699,18 @@ function generateInputSets(params) {
           // "none": 0,
           // "uncategorized": 0
 
+          let entry = defaults(entryDefaults, params.histogramsObj.histograms[type][input]);
+          entry = computeRatios(entry);
+
           if (
-               (params.histogramsObj.histograms[type][input].leftRatio >= minDominantMin)
-            || (params.histogramsObj.histograms[type][input].neutralRatio >= minDominantMin)
-            || (params.histogramsObj.histograms[type][input].rightRatio >= minDominantMin)
+               (entry.leftRatio >= minDominantMin)
+            || (entry.neutralRatio >= minDominantMin)
+            || (entry.rightRatio >= minDominantMin)
             ) 
           {
+
             newInputsObj.inputs[type].push(input);
+
             if (newInputsObj.inputs[type].length >= configuration.maxNumInputsPerType) {
               console.log(chalkBlue("GIS | " + type.toUpperCase() + " | MAX INPUTS REACHED " + newInputsObj.inputs[type].length));
               return cb("MAX");
@@ -1289,6 +1323,9 @@ function loadStream(params){
     });
 
     pipeline.on("close", function(){
+      if (isNaN(maxTotalCategorized)){
+        console.log("typeof maxTotalCategorized: " + typeof maxTotalCategorized);
+      }
       if (configuration.verbose) { console.log(chalkInfo("GIS | STREAM CLOSED | INPUTS: " + totalInputs + " | " + streamPath)); }
       return resolve({ 
         obj: fileObj, 
@@ -1300,6 +1337,9 @@ function loadStream(params){
     });
 
     pipeline.on("end", function(){
+      if (isNaN(maxTotalCategorized)){
+        console.log("typeof maxTotalCategorized: " + typeof maxTotalCategorized);
+      }
       if (configuration.verbose) { console.log(chalkInfo("GIS | STREAM END | INPUTS: " + totalInputs + " | " + streamPath)); }
       return resolve({ 
         obj: fileObj, 
@@ -1311,6 +1351,9 @@ function loadStream(params){
     });
 
     pipeline.on("finish", function(){
+      if (isNaN(maxTotalCategorized)){
+        console.log("typeof maxTotalCategorized: " + typeof maxTotalCategorized);
+      }
       if (configuration.verbose) { console.log(chalkInfo("GIS | STREAM FINISH | INPUTS: " + totalInputs + " | " + streamPath)); }
       return resolve({ 
         obj: fileObj, 
