@@ -435,6 +435,9 @@ const localInputsFolder = path.join(configHostFolder, "inputs");
 let inFolder = (hostname === PRIMARY_HOST) ? defaultInputsFolder : localInputsFolder;
 
 const defaultHistogramsFolder = path.join(configDefaultFolder, "histograms"); 
+const testHistogramsFolder = path.join(configDefaultFolder, "histograms_test"); 
+
+let histogramsRootFolder = defaultHistogramsFolder;
 
 const statsFolder = path.join(DROPBOX_ROOT_FOLDER, "stats", hostname); 
 const statsFile = configuration.DROPBOX.DROPBOX_STATS_FILE;
@@ -699,7 +702,7 @@ function generateInputSets(params) {
           // "none": 0,
           // "uncategorized": 0
 
-          let entry = defaults(entryDefaults, params.histogramsObj.histograms[type][input]);
+          let entry = defaults(params.histogramsObj.histograms[type][input], entryDefaults);
           entry = computeRatios(entry);
 
           if (
@@ -1323,23 +1326,17 @@ function loadStream(params){
     });
 
     pipeline.on("close", function(){
-      if (isNaN(maxTotalCategorized)){
-        console.log("typeof maxTotalCategorized: " + typeof maxTotalCategorized);
-      }
       if (configuration.verbose) { console.log(chalkInfo("GIS | STREAM CLOSED | INPUTS: " + totalInputs + " | " + streamPath)); }
-      return resolve({ 
-        obj: fileObj, 
-        maxTotalCategorized: maxTotalCategorized, 
-        totalInputs: totalInputs, 
-        lessThanMin: lessThanMin, 
-        moreThanMin: moreThanMin
-      });
+      // return resolve({ 
+      //   obj: fileObj, 
+      //   maxTotalCategorized: maxTotalCategorized, 
+      //   totalInputs: totalInputs, 
+      //   lessThanMin: lessThanMin, 
+      //   moreThanMin: moreThanMin
+      // });
     });
 
     pipeline.on("end", function(){
-      if (isNaN(maxTotalCategorized)){
-        console.log("typeof maxTotalCategorized: " + typeof maxTotalCategorized);
-      }
       if (configuration.verbose) { console.log(chalkInfo("GIS | STREAM END | INPUTS: " + totalInputs + " | " + streamPath)); }
       return resolve({ 
         obj: fileObj, 
@@ -1351,17 +1348,14 @@ function loadStream(params){
     });
 
     pipeline.on("finish", function(){
-      if (isNaN(maxTotalCategorized)){
-        console.log("typeof maxTotalCategorized: " + typeof maxTotalCategorized);
-      }
       if (configuration.verbose) { console.log(chalkInfo("GIS | STREAM FINISH | INPUTS: " + totalInputs + " | " + streamPath)); }
-      return resolve({ 
-        obj: fileObj, 
-        maxTotalCategorized: maxTotalCategorized, 
-        totalInputs: totalInputs, 
-        lessThanMin: lessThanMin, 
-        moreThanMin: moreThanMin
-      });
+      // return resolve({ 
+      //   obj: fileObj, 
+      //   maxTotalCategorized: maxTotalCategorized, 
+      //   totalInputs: totalInputs, 
+      //   lessThanMin: lessThanMin, 
+      //   moreThanMin: moreThanMin
+      // });
     });
 
     pipeline.on("error", function(err){
@@ -1563,7 +1557,10 @@ function runMain(){
         cb();
       }
       else{
-        const folder = defaultHistogramsFolder + "/types/" + type;
+
+        histogramsRootFolder = (configuration.testMode) ? testHistogramsFolder : defaultHistogramsFolder;
+
+        const folder = histogramsRootFolder + "/types/" + type;
         const file = "histograms_" + type + "_" + histogramType + ".json";
 
         const minTotalMin = (genInParams.minTotalMin[type] && (genInParams.minTotalMin[type] !== undefined)) 
