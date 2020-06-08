@@ -1314,6 +1314,13 @@ function loadStream(params){
       if (configuration.testMode && (totalInputs >= MAX_TEST_INPUTS) && (totalInputs % 100 === 0)) {
         console.log(chalkAlert("GIS | TEST MODE | END READ | TOTAL TEST INPUTS: " + totalInputs + " MAX: " + MAX_TEST_INPUTS));
         pipeline.destroy();
+        return resolve({ 
+          obj: fileObj, 
+          maxTotalCategorized: maxTotalCategorized, 
+          totalInputs: totalInputs, 
+          lessThanMin: lessThanMin, 
+          moreThanMin: moreThanMin
+        });
       }
     });
 
