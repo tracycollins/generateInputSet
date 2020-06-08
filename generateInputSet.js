@@ -40,29 +40,29 @@ const DEFAULT_MIN_DOM_MIN = 0.375;
 
 const DEFAULT_MIN_TOTAL_MIN = 3;
 
-const DEFAULT_MIN_TOTAL_MIN_TYPE_HASHMAP = {};
-DEFAULT_MIN_TOTAL_MIN_TYPE_HASHMAP.emoji = 75;
-DEFAULT_MIN_TOTAL_MIN_TYPE_HASHMAP.hashtags = 75;
-DEFAULT_MIN_TOTAL_MIN_TYPE_HASHMAP.ngrams = 10;
-DEFAULT_MIN_TOTAL_MIN_TYPE_HASHMAP.images = 1000;
-DEFAULT_MIN_TOTAL_MIN_TYPE_HASHMAP.locations = 40;
-DEFAULT_MIN_TOTAL_MIN_TYPE_HASHMAP.places = 3;
-DEFAULT_MIN_TOTAL_MIN_TYPE_HASHMAP.sentiment = 1;
-DEFAULT_MIN_TOTAL_MIN_TYPE_HASHMAP.urls = 3;
-DEFAULT_MIN_TOTAL_MIN_TYPE_HASHMAP.userMentions = 70;
-DEFAULT_MIN_TOTAL_MIN_TYPE_HASHMAP.words = 1300;
+const DEFAULT_MIN_TOTAL_MIN_TWEETS_TYPE_HASHMAP = {};
+DEFAULT_MIN_TOTAL_MIN_TWEETS_TYPE_HASHMAP.emoji = 75;
+DEFAULT_MIN_TOTAL_MIN_TWEETS_TYPE_HASHMAP.hashtags = 75;
+DEFAULT_MIN_TOTAL_MIN_TWEETS_TYPE_HASHMAP.ngrams = 10;
+DEFAULT_MIN_TOTAL_MIN_TWEETS_TYPE_HASHMAP.images = 1000;
+DEFAULT_MIN_TOTAL_MIN_TWEETS_TYPE_HASHMAP.locations = 40;
+DEFAULT_MIN_TOTAL_MIN_TWEETS_TYPE_HASHMAP.places = 3;
+DEFAULT_MIN_TOTAL_MIN_TWEETS_TYPE_HASHMAP.sentiment = 1;
+DEFAULT_MIN_TOTAL_MIN_TWEETS_TYPE_HASHMAP.urls = 3;
+DEFAULT_MIN_TOTAL_MIN_TWEETS_TYPE_HASHMAP.userMentions = 70;
+DEFAULT_MIN_TOTAL_MIN_TWEETS_TYPE_HASHMAP.words = 1300;
 
-const DEFAULT_MIN_TOTAL_MIN_USER_PROFILE_TYPE_HASHMAP = {};
-DEFAULT_MIN_TOTAL_MIN_USER_PROFILE_TYPE_HASHMAP.emoji = 50;
-DEFAULT_MIN_TOTAL_MIN_USER_PROFILE_TYPE_HASHMAP.hashtags = 50;
-DEFAULT_MIN_TOTAL_MIN_USER_PROFILE_TYPE_HASHMAP.ngrams = 5;
-DEFAULT_MIN_TOTAL_MIN_USER_PROFILE_TYPE_HASHMAP.images = 750;
-DEFAULT_MIN_TOTAL_MIN_USER_PROFILE_TYPE_HASHMAP.locations = 20;
-DEFAULT_MIN_TOTAL_MIN_USER_PROFILE_TYPE_HASHMAP.places = 1;
-DEFAULT_MIN_TOTAL_MIN_USER_PROFILE_TYPE_HASHMAP.sentiment = 1;
-DEFAULT_MIN_TOTAL_MIN_USER_PROFILE_TYPE_HASHMAP.urls = 1;
-DEFAULT_MIN_TOTAL_MIN_USER_PROFILE_TYPE_HASHMAP.userMentions = 20;
-DEFAULT_MIN_TOTAL_MIN_USER_PROFILE_TYPE_HASHMAP.words = 500;
+const DEFAULT_MIN_TOTAL_MIN_PROFILE_TYPE_HASHMAP = {};
+DEFAULT_MIN_TOTAL_MIN_PROFILE_TYPE_HASHMAP.emoji = 50;
+DEFAULT_MIN_TOTAL_MIN_PROFILE_TYPE_HASHMAP.hashtags = 50;
+DEFAULT_MIN_TOTAL_MIN_PROFILE_TYPE_HASHMAP.ngrams = 5;
+DEFAULT_MIN_TOTAL_MIN_PROFILE_TYPE_HASHMAP.images = 750;
+DEFAULT_MIN_TOTAL_MIN_PROFILE_TYPE_HASHMAP.locations = 20;
+DEFAULT_MIN_TOTAL_MIN_PROFILE_TYPE_HASHMAP.places = 1;
+DEFAULT_MIN_TOTAL_MIN_PROFILE_TYPE_HASHMAP.sentiment = 1;
+DEFAULT_MIN_TOTAL_MIN_PROFILE_TYPE_HASHMAP.urls = 1;
+DEFAULT_MIN_TOTAL_MIN_PROFILE_TYPE_HASHMAP.userMentions = 20;
+DEFAULT_MIN_TOTAL_MIN_PROFILE_TYPE_HASHMAP.words = 500;
 
 const DEFAULT_MIN_INPUTS_GENERATED = 1500;
 const DEFAULT_MAX_INPUTS_GENERATED = 2000;
@@ -84,8 +84,8 @@ configuration.testMode = GLOBAL_TEST_MODE;
 configuration.statsUpdateIntervalTime = STATS_UPDATE_INTERVAL;
 
 configuration.minTotalMin = DEFAULT_MIN_TOTAL_MIN;
-configuration.minTotalMinHashMap = DEFAULT_MIN_TOTAL_MIN_TYPE_HASHMAP;
-configuration.minTotalMinUserProfileHashMap = DEFAULT_MIN_TOTAL_MIN_USER_PROFILE_TYPE_HASHMAP;
+configuration.minTotalMinTweetsHashMap = DEFAULT_MIN_TOTAL_MIN_TWEETS_TYPE_HASHMAP;
+configuration.minTotalMinProfileHashMap = DEFAULT_MIN_TOTAL_MIN_PROFILE_TYPE_HASHMAP;
 configuration.minDominantMin = DEFAULT_MIN_DOM_MIN;
 
 configuration.minInputsGenerated = DEFAULT_MIN_INPUTS_GENERATED;
@@ -1079,20 +1079,15 @@ async function loadConfigFile(params) {
         newConfiguration.minTotalMin = loadedConfigObj.GIS_MIN_TOTAL_MIN;
       }
 
-      if (loadedConfigObj.GIS_MIN_TOTAL_MIN_USER_PROFILE_TYPE_HASHMAP !== undefined){
-        console.log("GIS | LOADED GIS_MIN_TOTAL_MIN_USER_PROFILE_TYPE_HASHMAP: " + loadedConfigObj.GIS_MIN_TOTAL_MIN_USER_PROFILE_TYPE_HASHMAP);
-        newConfiguration.minTotalMinUserProfileHashMap = loadedConfigObj.GIS_MIN_TOTAL_MIN_USER_PROFILE_TYPE_HASHMAP;
+      if (loadedConfigObj.GIS_MIN_TOTAL_MIN_PROFILE_TYPE_HASHMAP !== undefined){
+        console.log("GIS | LOADED GIS_MIN_TOTAL_MIN_PROFILE_TYPE_HASHMAP: " + loadedConfigObj.GIS_MIN_TOTAL_MIN_PROFILE_TYPE_HASHMAP);
+        newConfiguration.minTotalMinProfileHashMap = loadedConfigObj.GIS_MIN_TOTAL_MIN_PROFILE_TYPE_HASHMAP;
       }
 
-      if (loadedConfigObj.GIS_MIN_TOTAL_MIN_TYPE_HASHMAP !== undefined){
-        console.log("GIS | LOADED GIS_MIN_TOTAL_MIN_TYPE_HASHMAP: " + loadedConfigObj.GIS_MIN_TOTAL_MIN_TYPE_HASHMAP);
-        newConfiguration.minTotalMinHashMap = loadedConfigObj.GIS_MIN_TOTAL_MIN_TYPE_HASHMAP;
+      if (loadedConfigObj.GIS_MIN_TOTAL_MIN_TWEETS_TYPE_HASHMAP !== undefined){
+        console.log("GIS | LOADED GIS_MIN_TOTAL_MIN_TWEETS_TYPE_HASHMAP: " + loadedConfigObj.GIS_MIN_TOTAL_MIN_TWEETS_TYPE_HASHMAP);
+        newConfiguration.minTotalMinTweetsHashMap = loadedConfigObj.GIS_MIN_TOTAL_MIN_TWEETS_TYPE_HASHMAP;
       }
-
-      // if (loadedConfigObj.GIS_MAX_TOTAL_MIN !== undefined){
-      //   console.log("GIS | LOADED GIS_MAX_TOTAL_MIN: " + loadedConfigObj.GIS_MAX_TOTAL_MIN);
-      //   newConfiguration.maxTotalMin = loadedConfigObj.GIS_MAX_TOTAL_MIN;
-      // }
 
       if (loadedConfigObj.GIS_MIN_DOMINANT_MIN !== undefined){
         console.log("LOADED GIS_MIN_DOMINANT_MIN: " + loadedConfigObj.GIS_MIN_DOMINANT_MIN);
@@ -1503,7 +1498,7 @@ function runMain(){
     const genInParams = {};
 
     genInParams.minTotalMin = {};
-    genInParams.minTotalMin = configuration.userProfileOnlyFlag ? configuration.minTotalMinUserProfileHashMap : configuration.minTotalMinHashMap;
+    genInParams.minTotalMin = configuration.userProfileOnlyFlag ? configuration.minTotalMinProfileHashMap : configuration.minTotalMinTweetsHashMap;
 
     genInParams.minDominantMin = {};
     genInParams.minDominantMin.emoji = configuration.minDominantMin;
