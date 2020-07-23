@@ -162,6 +162,7 @@ const deepcopy = require("deep-copy");
 const table = require("text-table");
 
 const chalk = require("chalk");
+const chalkGreen = chalk.green;
 const chalkBlue = chalk.blue;
 const chalkBlueBold = chalk.blue.bold;
 const chalkError = chalk.bold.red;
@@ -653,8 +654,10 @@ function generateInputSets(params) {
     newInputsObj.inputs = {};
     newInputsObj.inputsMinimum = {};
 
-    const inTypes = Object.keys(params.histogramsObj.histograms);
-    inTypes.sort();
+    // const inTypes = Object.keys(params.histogramsObj.histograms);
+    // inTypes.sort();
+
+    const inTypes = [params.type];
 
     async.eachSeries(inTypes, async function(type){
 
@@ -664,7 +667,10 @@ function generateInputSets(params) {
 
       const totalTypeInputs = Object.keys(params.histogramsObj.histograms[type]).length;
 
-      console.log("TYPE | " + type.toUpperCase() + " | " + totalTypeInputs);
+      // console.log(chalkInfo(MODULE_ID_PREFIX
+      //   + " | " + type.toUpperCase()
+      //   + " | " + totalTypeInputs
+      // ));
 
       newInputsObj.meta.type[type] = {};
 
@@ -684,6 +690,7 @@ function generateInputSets(params) {
       let results = {};
 
       try {
+
         results = await sortedHashmap({ sortKey: "total", hashmap: params.histogramsObj.histograms[type], max: 10000});
 
         async.eachSeries(results.sortedKeys, function(input, cb){
@@ -714,21 +721,36 @@ function generateInputSets(params) {
 
             newInputsObj.inputs[type].push(input);
 
-            if (newInputsObj.inputs[type].length >= configuration.maxNumInputsPerType) {
-              console.log(chalkBlue("GIS | " + type.toUpperCase() + " | MAX INPUTS REACHED " + newInputsObj.inputs[type].length));
-              return cb("MAX");
-            }
+            // if (newInputsObj.inputs[type].length >= configuration.maxNumInputsPerType) {
+            //   console.log(chalkBlue("GIS | " + type.toUpperCase() + " | MAX INPUTS REACHED " + newInputsObj.inputs[type].length));
+            //   return cb("MAX");
+            // }
           }
 
           cb();
 
         }, function(err){
+
           if (err && (err !== "MAX")){
             console.log(chalkError("GIS | *** SORTED HASHMAP ERROR:", err));
             return err;
           }
+
+          const tempShuffledArray = _.shuffle(newInputsObj.inputs[type]);
+
+          if (tempShuffledArray.length >= configuration.maxNumInputsPerType) {
+            console.log(chalkAlert("GIS | " + type.toUpperCase()
+              + " | MAX INPUTS EXCEEDED: " + tempShuffledArray.length 
+              + " | SLICING TO: " + configuration.maxNumInputsPerType
+            ));
+          }
+
+          newInputsObj.inputs[type] = tempShuffledArray.slice(0, configuration.maxNumInputsPerType);
+
           newInputsObj.inputs[type].sort();
+
           newInputsObj.meta.type[type].numInputs = newInputsObj.inputs[type].length;
+
           console.log(chalkBlue("GIS | " + type.toUpperCase() + " | " + newInputsObj.meta.type[type].numInputs + " INPUTS"));
           return;
         });
@@ -811,10 +833,10 @@ async function connectDb(){
     db.on("error", async function(err){
       statsObj.status = "MONGO ERROR";
       statsObj.dbConnectionReady = false;
-      console.log(chalkError(MODULE_ID_PREFIX + " | *** MONGO DB CONNECTION ERROR"));
+      console.log(chalkError(MODULE_ID_PREFIX + " | *** MONGO DB CONNECTION ERROR: " + err));
     });
 
-    db.on("close", async function(err){
+    db.on("close", async function(){
       statsObj.status = "MONGO CLOSED";
       statsObj.dbConnectionReady = false;
       console.log(chalkError(MODULE_ID_PREFIX + " | *** MONGO DB CONNECTION CLOSED"));
@@ -1316,7 +1338,7 @@ function loadStream(params){
     });
 
     pipeline.on("header", function(){
-      console.log("GIS | HEADER");
+      debug("GIS | HEADER");
     });
 
     pipeline.on("footer", function(){
@@ -1408,7 +1430,10 @@ function runUserProfileCharCodes(){
 
     for (const userProfileProperty of userProfileProperties){
 
-      console.log("TYPE | " + userProfileProperty.toUpperCase() + " | " + globalInputsObj.meta.userProfileCharCounts[userProfileProperty]);
+      // console.log(chalkInfo(MODULE_ID_PREFIX
+      //   + " | " + userProfileProperty.toUpperCase()
+      //   + " | " + globalInputsObj.meta.userProfileCharCounts[userProfileProperty]
+      // ));
 
       globalInputsObj.meta.type[userProfileProperty] = {};
 
@@ -1572,7 +1597,7 @@ function runMain(){
             return cb();
           }
 
-          console.log(chalkBlue("\nGIS | +++ LOADED HISTOGRAM"
+          console.log(chalkGreen("GIS | +++ LOADED HISTOGRAM"
             + " | " + histogramType.toUpperCase()
             + " | " + type.toUpperCase()
             + "\nGIS | TOTAL ITEMS:          " + results.totalInputs
@@ -1586,6 +1611,9 @@ function runMain(){
 
           genInParams.histogramsObj.histograms[type] = {};
           genInParams.histogramsObj.histograms[type] = results.obj;
+
+          genInParams.type = type;
+          genInParams.histogram = results.obj;
 
           generateInputSets(genInParams)
           .then(function(inputsObj){
