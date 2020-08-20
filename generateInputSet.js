@@ -1,3 +1,6 @@
+const DEFAULT_PRIMARY_HOST = "google";
+const DEFAULT_DATABASE_HOST = "macpro2";
+
 const os = require("os");
 
 let hostname = os.hostname();
@@ -8,6 +11,13 @@ hostname = hostname.replace(/.fios-router.home/g, "");
 hostname = hostname.replace(/word0-instance-1/g, "google");
 hostname = hostname.replace(/word-1/g, "google");
 hostname = hostname.replace(/word/g, "google");
+
+let configuration = {};
+
+configuration.primaryHost = process.env.PRIMARY_HOST || DEFAULT_PRIMARY_HOST;
+configuration.databaseHost = process.env.DATABASE_HOST || DEFAULT_DATABASE_HOST;
+configuration.isPrimaryHost = (hostname === configuration.primaryHost);
+configuration.isDatabaseHost = (hostname === configuration.databaseHost);
 
 const MAX_TEST_INPUTS = 10000
 
@@ -69,7 +79,6 @@ const DEFAULT_MAX_INPUTS_GENERATED = 2000;
 const DEFAULT_MAX_NUM_INPUTS_PER_TYPE = 200;
 const DEFAULT_MIN_NUM_INPUTS_PER_TYPE = 100;
 
-let configuration = {};
 
 configuration.verbose = DEFAULT_VERBOSE_MODE;
 
@@ -106,8 +115,6 @@ const moment = require("moment");
 
 let defaultConfiguration = {}; // general configuration for TFE
 let hostConfiguration = {}; // host-specific configuration for TFE
-
-const PRIMARY_HOST = process.env.PRIMARY_HOST || "mms1";
 
 const DEFAULT_TWEETS_INPUT_TYPES = [
   "emoji",
@@ -433,7 +440,7 @@ let stdin;
 const defaultInputsFolder = path.join(configDefaultFolder, "inputs"); 
 const localInputsFolder = path.join(configHostFolder, "inputs"); 
 
-let inFolder = (hostname === PRIMARY_HOST) ? defaultInputsFolder : localInputsFolder;
+let inFolder = (configuration.isDatabaseHost) ? defaultInputsFolder : localInputsFolder;
 
 const defaultHistogramsFolder = path.join(configDefaultFolder, "histograms"); 
 const testHistogramsFolder = path.join(configDefaultFolder, "histograms_test"); 
@@ -1722,14 +1729,16 @@ function runMain(){
 
           await tcUtils.saveFile({folder: inFolder, file: inFile, obj: globalInputsObj});
 
-          console.log(chalkInfo("GIS | ... UPDATING INPUTS CONFIG FILE: " + configDefaultFolder + "/" + defaultInputsConfigFile));
+          if (configuration.isDatabaseHost) {
+            console.log(chalkInfo("GIS | ... UPDATING INPUTS CONFIG FILE: " + configDefaultFolder + "/" + defaultInputsConfigFile));
 
-          const networkInputsConfigObj = await tcUtils.loadFile({folder: configDefaultFolder, file: defaultInputsConfigFile, noErrorNotFound: true });
+            const networkInputsConfigObj = await tcUtils.loadFile({folder: configDefaultFolder, file: defaultInputsConfigFile, noErrorNotFound: true });
 
-          networkInputsConfigObj.INPUTS_IDS.push(globalInputsObj.inputsId);
-          networkInputsConfigObj.INPUTS_IDS = _.uniq(networkInputsConfigObj.INPUTS_IDS);
+            networkInputsConfigObj.INPUTS_IDS.push(globalInputsObj.inputsId);
+            networkInputsConfigObj.INPUTS_IDS = _.uniq(networkInputsConfigObj.INPUTS_IDS);
 
-          await tcUtils.saveFile({folder: configDefaultFolder, file: defaultInputsConfigFile, obj: networkInputsConfigObj});
+            await tcUtils.saveFile({folder: configDefaultFolder, file: defaultInputsConfigFile, obj: networkInputsConfigObj});
+          }
 
           let slackText = "\n*GIS | INPUTS*";
           slackText = slackText + "\n" + globalInputsObj.inputsId;
