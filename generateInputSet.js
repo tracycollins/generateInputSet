@@ -1,5 +1,6 @@
 const DEFAULT_PRIMARY_HOST = "google";
 const DEFAULT_DATABASE_HOST = "macpro2";
+const DEFAULT_RANDOM_SEED_FLAG = true;
 
 const os = require("os");
 
@@ -14,6 +15,7 @@ hostname = hostname.replace(/word/g, "google");
 
 let configuration = {};
 
+configuration.randomSeedFlag = DEFAULT_RANDOM_SEED_FLAG;
 configuration.primaryHost = process.env.PRIMARY_HOST || DEFAULT_PRIMARY_HOST;
 configuration.databaseHost = process.env.DATABASE_HOST || DEFAULT_DATABASE_HOST;
 configuration.isPrimaryHost = (hostname === configuration.primaryHost);
@@ -112,6 +114,7 @@ const ThreeceeUtilities = require("@threeceelabs/threecee-utilities");
 const tcUtils = new ThreeceeUtilities(tcuChildName);
 
 const moment = require("moment");
+const random = require("random")
 
 let defaultConfiguration = {}; // general configuration for TFE
 let hostConfiguration = {}; // host-specific configuration for TFE
@@ -1069,6 +1072,16 @@ async function loadConfigFile(params) {
         }
       }
 
+      if (loadedConfigObj.GIS_RANDOM_SEED_FLAG !== undefined) {
+        console.log(MODULE_ID_PREFIX + " | LOADED GIS_RANDOM_SEED_FLAG: " + loadedConfigObj.GIS_RANDOM_SEED_FLAG);
+        if ((loadedConfigObj.GIS_RANDOM_SEED_FLAG === true) || (loadedConfigObj.GIS_RANDOM_SEED_FLAG === "true")) {
+          newConfiguration.randomSeedFlag = true;
+        }
+        if ((loadedConfigObj.GIS_RANDOM_SEED_FLAG === false) || (loadedConfigObj.GIS_RANDOM_SEED_FLAG === "false")) {
+          newConfiguration.randomSeedFlag = false;
+        }
+      }
+
       if (loadedConfigObj.GIS_MAX_NUM_INPUTS_PER_TYPE !== undefined){
         console.log("GIS | LOADED GIS_MAX_NUM_INPUTS_PER_TYPE: " + loadedConfigObj.GIS_MAX_NUM_INPUTS_PER_TYPE);
         newConfiguration.maxNumInputsPerType = loadedConfigObj.GIS_MAX_NUM_INPUTS_PER_TYPE;
@@ -1528,19 +1541,35 @@ function runMain(){
     genInParams.minTotalMin = {};
     genInParams.minTotalMin = configuration.userProfileOnlyFlag ? configuration.minTotalMinProfileHashMap : configuration.minTotalMinTweetsHashMap;
 
+
     genInParams.minDominantMin = {};
-    genInParams.minDominantMin.emoji = configuration.minDominantMin;
-    genInParams.minDominantMin.friends = configuration.minDominantMin;
-    genInParams.minDominantMin.hashtags = configuration.minDominantMin;
-    genInParams.minDominantMin.images = configuration.minDominantMin;
-    genInParams.minDominantMin.locations = configuration.minDominantMin;
-    genInParams.minDominantMin.media = configuration.minDominantMin;
-    genInParams.minDominantMin.ngrams = configuration.minDominantMin;
-    genInParams.minDominantMin.places = configuration.minDominantMin;
-    genInParams.minDominantMin.sentiment = configuration.minDominantMin;
-    genInParams.minDominantMin.urls = configuration.minDominantMin;
-    genInParams.minDominantMin.userMentions = configuration.minDominantMin;
-    genInParams.minDominantMin.words = configuration.minDominantMin;
+
+    let randomSeed = 1;
+
+    DEFAULT_TWEETS_INPUT_TYPES.forEach((inputType) => {
+
+      randomSeed = configuration.randomSeedFlag ? random.float(0.9,1.1) : 1;
+      genInParams.minDominantMin[inputType] = configuration.minDominantMin * randomSeed;
+
+      console.log(chalkLog(MODULE_ID_PREFIX
+        + " | RANDOM SEED: " + randomSeed.toFixed(3)
+        + " | MIN DOM MIN: " + genInParams.minDominantMin[inputType].toFixed(3)
+        + " | INPUT TYPE: " + inputType.toUpperCase()
+      ))
+    });
+
+    // genInParams.minDominantMin.emoji = configuration.minDominantMin * random.float(0.9,1.1);
+    // genInParams.minDominantMin.friends = configuration.minDominantMin;
+    // genInParams.minDominantMin.hashtags = configuration.minDominantMin;
+    // genInParams.minDominantMin.images = configuration.minDominantMin;
+    // genInParams.minDominantMin.locations = configuration.minDominantMin;
+    // genInParams.minDominantMin.media = configuration.minDominantMin;
+    // genInParams.minDominantMin.ngrams = configuration.minDominantMin;
+    // genInParams.minDominantMin.places = configuration.minDominantMin;
+    // genInParams.minDominantMin.sentiment = configuration.minDominantMin;
+    // genInParams.minDominantMin.urls = configuration.minDominantMin;
+    // genInParams.minDominantMin.userMentions = configuration.minDominantMin;
+    // genInParams.minDominantMin.words = configuration.minDominantMin;
 
     genInParams.histogramsObj = {};
     genInParams.histogramsObj.histograms = {};
