@@ -597,7 +597,7 @@ function sortedHashmap(params) {
 
     const keys = Object.keys(params.hashmap);
 
-    const sortedKeys = keys.sort(function(a,b){
+    let sortedKeys = keys.sort(function(a,b){
       // const objA = params.hashmap.get(a);
       // const objB = params.hashmap.get(b);
       const objAvalue = dot.pick(params.sortKey, params.hashmap[a]);
@@ -606,7 +606,10 @@ function sortedHashmap(params) {
     });
 
     if (keys !== undefined) {
-      if (sortedKeys !== undefined) { 
+      if (sortedKeys !== undefined) {
+
+        if (params.randomSeedFlag) { sortedKeys = _.shuffle(sortedKeys); }
+
         resolve({sortKey: params.sortKey, sortedKeys: sortedKeys.slice(0,params.max)});
       }
       else {
@@ -701,7 +704,12 @@ function generateInputSets(params) {
 
       try {
 
-        results = await sortedHashmap({ sortKey: "total", hashmap: params.histogramsObj.histograms[type], max: 10000});
+        results = await sortedHashmap({
+          randomSeedFlag: configuration.randomSeedFlag, 
+          sortKey: "total", 
+          hashmap: params.histogramsObj.histograms[type], 
+          max: 10000
+        });
 
         async.eachSeries(results.sortedKeys, function(input, cb){
 
@@ -1541,7 +1549,6 @@ function runMain(){
     genInParams.minTotalMin = {};
     genInParams.minTotalMin = configuration.userProfileOnlyFlag ? configuration.minTotalMinProfileHashMap : configuration.minTotalMinTweetsHashMap;
 
-
     genInParams.minDominantMin = {};
 
     let randomSeed = 1;
@@ -1557,19 +1564,6 @@ function runMain(){
         + " | INPUT TYPE: " + inputType.toUpperCase()
       ))
     });
-
-    // genInParams.minDominantMin.emoji = configuration.minDominantMin * random.float(0.9,1.1);
-    // genInParams.minDominantMin.friends = configuration.minDominantMin;
-    // genInParams.minDominantMin.hashtags = configuration.minDominantMin;
-    // genInParams.minDominantMin.images = configuration.minDominantMin;
-    // genInParams.minDominantMin.locations = configuration.minDominantMin;
-    // genInParams.minDominantMin.media = configuration.minDominantMin;
-    // genInParams.minDominantMin.ngrams = configuration.minDominantMin;
-    // genInParams.minDominantMin.places = configuration.minDominantMin;
-    // genInParams.minDominantMin.sentiment = configuration.minDominantMin;
-    // genInParams.minDominantMin.urls = configuration.minDominantMin;
-    // genInParams.minDominantMin.userMentions = configuration.minDominantMin;
-    // genInParams.minDominantMin.words = configuration.minDominantMin;
 
     genInParams.histogramsObj = {};
     genInParams.histogramsObj.histograms = {};
