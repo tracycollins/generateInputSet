@@ -1,3 +1,13 @@
+const dotenv = require("dotenv");
+const envConfig = dotenv.config({path: '/Users/tc/Dropbox/Apps/wordAssociation/config/utility/default/env'})
+
+if (envConfig.error) {
+  throw envConfig.error
+}
+ 
+console.log("TNN | ENV CONFIG")
+console.log(envConfig.parsed)
+
 const DEFAULT_PRIMARY_HOST = "google";
 const DEFAULT_DATABASE_HOST = "macpro2";
 const DEFAULT_RANDOM_SEED_FLAG = true;
@@ -164,6 +174,7 @@ const util = require("util");
 const _ = require("lodash");
 const dot = require("dot-object");
 const defaults = require("object.defaults");
+const HashMap = require("hashmap").HashMap;
 
 const async = require("async");
 const debug = require("debug")("gis");
@@ -210,160 +221,54 @@ const configHostFile = hostname + "_" + configuration.DROPBOX.DROPBOX_CONFIG_FIL
 //=========================================================================
 // SLACK
 //=========================================================================
+const { WebClient } = require('@slack/web-api');
+
+console.log("process.env.SLACK_BOT_TOKEN: ", process.env.SLACK_BOT_TOKEN)
+const slackBotToken = process.env.SLACK_BOT_TOKEN;
+
+const slackWebClient = new WebClient(slackBotToken);
 
 const slackChannel = "gis";
-const HashMap = require("hashmap").HashMap;
+
 const channelsHashMap = new HashMap();
 
-const slackOAuthAccessToken = "xoxp-3708084981-3708084993-206468961315-ec62db5792cd55071a51c544acf0da55";
-const slackConversationId = "D65CSAELX"; // wordbot
-const slackRtmToken = "xoxb-209434353623-bNIoT4Dxu1vv8JZNgu7CDliy";
-
-let slackRtmClient;
-let slackWebClient;
-
-async function slackSendRtmMessage(msg){
-  console.log(chalkBlue(MODULE_ID_PREFIX + " | SLACK RTM | SEND: " + msg));
-
-  const sendResponse = await slackRtmClient.sendMessage(msg, slackConversationId);
-
-  console.log(chalkLog(MODULE_ID_PREFIX + " | SLACK RTM | >T\n" + jsonPrint(sendResponse)));
-  return sendResponse;
-}
-
 async function slackSendWebMessage(msgObj){
-
   try{
-    
-    const token = msgObj.token || slackOAuthAccessToken;
+
     const channel = msgObj.channel || configuration.slackChannel.id;
     const text = msgObj.text || msgObj;
 
-    const message = {
-      token: token, 
+    await slackWebClient.chat.postMessage({
+      text: text,
       channel: channel,
-      text: text
-    };
+    });
 
-    if (msgObj.attachments !== undefined) {
-      message.attachments = msgObj.attachments;
-    }
-
-    if (slackWebClient && slackWebClient !== undefined) {
-      const sendResponse = await slackWebClient.chat.postMessage(message);
-      return sendResponse;
-    }
-    else {
-      console.log(chalkAlert(MODULE_ID_PREFIX + " | SLACK WEB NOT CONFIGURED | SKIPPING SEND SLACK MESSAGE\n" + tcUtils.jsonPrint(message)));
-      return;
-    }
   }
   catch(err){
     console.log(chalkAlert(MODULE_ID_PREFIX + " | *** slackSendWebMessage ERROR: " + err));
-    console.log(chalkAlert(MODULE_ID_PREFIX + " | *** slackSendWebMessage msgObj\n" + tcUtils.jsonPrint(msgObj)));
     throw err;
   }
-}
-
-function slackMessageHandler(message){
-  return new Promise(function(resolve, reject){
-
-    try {
-
-      console.log(chalkInfo(MODULE_ID_PREFIX + " | MESSAGE | " + message.type + " | " + message.text));
-
-      if (message.type !== "message") {
-        console.log(chalkAlert("Unhandled MESSAGE TYPE: " + message.type));
-        return resolve();
-      }
-
-      const text = message.text.trim();
-      const textArray = text.split("|");
-
-      const sourceMessage = (textArray[2]) ? textArray[2].trim() : "NONE";
-
-      switch (sourceMessage) {
-        case "END FETCH ALL":
-        case "ERROR":
-        case "FETCH FRIENDS":
-        case "FSM INIT":
-        case "FSM FETCH_ALL":
-        case "GEN AUTO CAT":
-        case "INIT CHILD":
-        case "INIT LANG ANALYZER":
-        case "INIT MAX INPUT HASHMAP":
-        case "INIT NNs":
-        case "INIT RAN NNs":
-        case "INIT RNT CHILD":
-        case "INIT TWITTER USERS":
-        case "INIT TWITTER":
-        case "INIT UNFOLLOWABLE USER SET":
-        case "INIT UNFOLLOWABLE":
-        case "INIT":
-        case "LOAD BEST NN":
-        case "LOAD NN":
-        case "MONGO DB CONNECTED":
-        case "PONG":
-        case "QUIT":
-        case "QUITTING":
-        case "READY":
-        case "RESET":
-        case "SAV NN HASHMAP":
-        case "SLACK QUIT":
-        case "SLACK READY":
-        case "SLACK RTM READY":
-        case "START":
-        case "STATS":
-        case "TEXT": 
-        case "UPDATE HISTOGRAMS":
-        case "UPDATE NN STATS":
-        case "WAIT UPDATE STATS":
-        case "END UPDATE STATS":
-        case "UPDATE USER CAT STATS":
-          resolve();
-        break;
-        case "STATSUS":
-          console.log(chalkInfo(message.text));
-          resolve();
-        break;
-        case "PING":
-          console.log(chalkInfo("PING"));
-          // slackSendWebMessage(hostname + " | " + MODULE_ID_PREFIX + " | PONG");
-          resolve();
-        break;
-        case "NONE":
-          resolve();
-        break;
-        default:
-          console.log(chalkAlert(MODULE_ID_PREFIX + " | *** UNDEFINED SLACK MESSAGE: " + message.text));
-          // reject(new Error("UNDEFINED SLACK MESSAGE TYPE: " + message.text));
-          resolve({text: "UNDEFINED SLACK MESSAGE", message: message});
-      }
-    }
-    catch(err){
-      reject(err);
-    }
-
-  });
 }
 
 async function initSlackWebClient(){
   try {
 
-    const { WebClient } = require("@slack/client");
-    slackWebClient = new WebClient(slackRtmToken);
+    console.log(chalkLog(MODULE_ID + " | INIT SLACK WEB CLIENT"))
 
-    const conversationsListResponse = await slackWebClient.conversations.list({token: slackOAuthAccessToken});
+    const authTestResponse = await slackWebClient.auth.test()
+
+    console.log({authTestResponse})
+
+    const conversationsListResponse = await slackWebClient.conversations.list();
 
     conversationsListResponse.channels.forEach(async function(channel){
 
-      console.log(chalkLog(MODULE_ID_PREFIX + " | CHANNEL | " + channel.id + " | " + channel.name));
+      debug(chalkLog("TNN | SLACK CHANNEL | " + channel.id + " | " + channel.name));
 
       if (channel.name === slackChannel) {
         configuration.slackChannel = channel;
 
         const message = {
-          token: slackOAuthAccessToken, 
           channel: configuration.slackChannel.id,
           text: "OP"
         };
@@ -388,45 +293,9 @@ async function initSlackWebClient(){
     return;
   }
   catch(err){
-    console.log(chalkError(MODULE_ID_PREFIX + " | *** INIT SLACK WEB CLIENT ERROR: " + err));
+    console.log(chalkError("TNN | *** INIT SLACK WEB CLIENT ERROR: " + err));
     throw err;
   }
-}
-
-async function initSlackRtmClient(){
-
-  const { RTMClient } = require("@slack/client");
-  slackRtmClient = new RTMClient(slackRtmToken);
-
-  await slackRtmClient.start();
-
-  slackRtmClient.on("slack_event", async function(eventType, event){
-    switch (eventType) {
-      case "pong":
-        debug(chalkLog(MODULE_ID_PREFIX + " | SLACK RTM PONG | " + getTimeStamp() + " | " + event.reply_to));
-      break;
-      default: debug(chalkInfo(MODULE_ID_PREFIX + " | SLACK RTM EVENT | " + getTimeStamp() + " | " + eventType + "\n" + jsonPrint(event)));
-    }
-  });
-
-
-  slackRtmClient.on("message", async function(message){
-    if (configuration.verbose) { console.log(chalkLog(MODULE_ID_PREFIX + " | RTM R<\n" + jsonPrint(message))); }
-    debug(`TNN | SLACK RTM MESSAGE | R< | CH: ${message.channel} | USER: ${message.user} | ${message.text}`);
-
-    try {
-      await slackMessageHandler(message);
-    }
-    catch(err){
-      console.log(chalkError(MODULE_ID_PREFIX + " | *** SLACK RTM MESSAGE ERROR: " + err));
-    }
-
-  });
-
-  slackRtmClient.on("ready", async function(){
-    if (configuration.verbose) { await slackSendRtmMessage(hostname + " | TNN | SLACK RTM READY"); }
-    return;
-  });
 }
 
 const globalInputsObj = {};
@@ -598,8 +467,6 @@ function sortedHashmap(params) {
     const keys = Object.keys(params.hashmap);
 
     let sortedKeys = keys.sort(function(a,b){
-      // const objA = params.hashmap.get(a);
-      // const objB = params.hashmap.get(b);
       const objAvalue = dot.pick(params.sortKey, params.hashmap[a]);
       const objBvalue = dot.pick(params.sortKey, params.hashmap[b]);
       return objBvalue - objAvalue;
@@ -667,9 +534,6 @@ function generateInputSets(params) {
     newInputsObj.inputs = {};
     newInputsObj.inputsMinimum = {};
 
-    // const inTypes = Object.keys(params.histogramsObj.histograms);
-    // inTypes.sort();
-
     const inTypes = [params.type];
 
     async.eachSeries(inTypes, async function(type){
@@ -679,11 +543,6 @@ function generateInputSets(params) {
       minDominantMin = (params.minDominantMin && params.minDominantMin[type]) ? params.minDominantMin[type] : minDominantMin;
 
       const totalTypeInputs = Object.keys(params.histogramsObj.histograms[type]).length;
-
-      // console.log(chalkInfo(MODULE_ID_PREFIX
-      //   + " | " + type.toUpperCase()
-      //   + " | " + totalTypeInputs
-      // ));
 
       newInputsObj.meta.type[type] = {};
 
@@ -739,10 +598,6 @@ function generateInputSets(params) {
 
             newInputsObj.inputs[type].push(input);
 
-            // if (newInputsObj.inputs[type].length >= configuration.maxNumInputsPerType) {
-            //   console.log(chalkBlue("GIS | " + type.toUpperCase() + " | MAX INPUTS REACHED " + newInputsObj.inputs[type].length));
-            //   return cb("MAX");
-            // }
           }
 
           cb();
@@ -1787,7 +1642,6 @@ setTimeout(async function(){
 
     statsObj.status = "START";
 
-    initSlackRtmClient();
     initSlackWebClient();
 
     if (configuration.testMode) {

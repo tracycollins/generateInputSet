@@ -10,6 +10,8 @@
     "command-line-args": "^5.1.1",
     "deepmerge": "^4.2.2",
     "dot-object": "^2.1.4",
+    "dotenv": "^8.2.0",
+    "hashmap": "^2.4.0",
     "random": "^2.2.0",
     "text-table": "^0.2.0"
   },
