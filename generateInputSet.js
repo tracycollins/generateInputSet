@@ -9,7 +9,7 @@ console.log("TNN | ENV CONFIG")
 console.log(envConfig.parsed)
 
 const DEFAULT_PRIMARY_HOST = "google";
-const DEFAULT_DATABASE_HOST = "macpro2";
+const DEFAULT_DATABASE_HOST = "mms3";
 const DEFAULT_RANDOM_SEED_FLAG = true;
 
 const os = require("os");
