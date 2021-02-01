@@ -5,6 +5,8 @@ if (envConfig.error) {
   throw envConfig.error
 }
  
+console.log("GIS | +++ ENV CONFIG LOADED")
+
 const DEFAULT_PRIMARY_HOST = "google";
 const DEFAULT_DATABASE_HOST = "mms3";
 const DEFAULT_RANDOM_SEED_FLAG = true;
