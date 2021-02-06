@@ -122,6 +122,15 @@ const tcuChildName = MODULE_ID_PREFIX + "_TCU";
 const ThreeceeUtilities = require("@threeceelabs/threecee-utilities");
 const tcUtils = new ThreeceeUtilities(tcuChildName);
 
+const mguAppName = MODULE_ID_PREFIX + "_MGU";
+const MongooseUtilities = require("@threeceelabs/mongoose-utilities");
+const mgUtils = new MongooseUtilities(mguAppName);
+
+mgUtils.on("ready", async () => {
+  console.log(`${MODULE_ID_PREFIX} | +++ MONGOOSE UTILS READY: ${mguAppName}`);
+  statsObj.dbConnectionReady = true;
+})
+
 const moment = require("moment");
 const random = require("random")
 
@@ -184,7 +193,7 @@ const table = require("text-table");
 const chalk = require("chalk");
 const chalkGreen = chalk.green;
 const chalkBlue = chalk.blue;
-const chalkBlueBold = chalk.blue.bold;
+// const chalkBlueBold = chalk.blue.bold;
 const chalkError = chalk.bold.red;
 const chalkAlert = chalk.red;
 const chalkLog = chalk.gray;
@@ -690,47 +699,6 @@ function quit(cause){
 process.on( "SIGINT", function() {
   quit("SIGINT");
 });
-
-
-async function connectDb(){
-
-  try {
-
-    statsObj.status = "CONNECTING MONGO DB";
-
-    console.log(chalkBlueBold(MODULE_ID_PREFIX + " | CONNECT MONGO DB ..."));
-
-    const db = await global.wordAssoDb.connect(MODULE_ID_PREFIX + "_" + process.pid);
-
-    db.on("error", async function(err){
-      statsObj.status = "MONGO ERROR";
-      statsObj.dbConnectionReady = false;
-      console.log(chalkError(MODULE_ID_PREFIX + " | *** MONGO DB CONNECTION ERROR: " + err));
-    });
-
-    db.on("close", async function(){
-      statsObj.status = "MONGO CLOSED";
-      statsObj.dbConnectionReady = false;
-      console.log(chalkError(MODULE_ID_PREFIX + " | *** MONGO DB CONNECTION CLOSED"));
-    });
-
-    db.on("disconnected", async function(){
-      statsObj.status = "MONGO DISCONNECTED";
-      statsObj.dbConnectionReady = false;
-      console.log(chalkAlert(MODULE_ID_PREFIX + " | *** MONGO DB DISCONNECTED"));
-    });
-
-    console.log(chalk.green(MODULE_ID_PREFIX + " | MONGOOSE DEFAULT CONNECTION OPEN"));
-
-    statsObj.dbConnectionReady = true;
-
-    return db;
-  }
-  catch(err){
-    console.log(chalkError(MODULE_ID_PREFIX + " | *** MONGO DB CONNECT ERROR: " + err));
-    throw err;
-  }
-}
 
 function getElapsedTimeStamp(){
   statsObj.elapsedMS = moment().valueOf() - statsObj.startTimeMoment.valueOf();
@@ -1654,7 +1622,7 @@ setTimeout(async function(){
       + "\n--------------------------------------------------------"
     ));
 
-    await connectDb();
+    global.dbConnection = await mgUtils.connectDb()
 
     if (configuration.testMode) { 
       inFolder += "_test";
