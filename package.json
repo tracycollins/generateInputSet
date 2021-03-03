@@ -6,7 +6,6 @@
   "dependencies": {
     "@slack/client": "^5.0.2",
     "@threeceelabs/mongoose-utilities": "^1.0.12",
-    "@threeceelabs/threecee-utilities": "^1.2.10",
     "command-line-args": "^5.1.1",
     "deepmerge": "^4.2.2",
     "dot-object": "^2.1.4",
