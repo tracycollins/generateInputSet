@@ -5,7 +5,7 @@
   "main": "generateInputSet.js",
   "dependencies": {
     "@slack/client": "^5.0.2",
-    "@threeceelabs/mongoose-utilities": "^1.0.12",
+    "@threeceelabs/mongoose-utilities": "^1.0.13",
     "command-line-args": "^5.1.1",
     "deepmerge": "^4.2.2",
     "dot-object": "^2.1.4",
