@@ -1,11 +1,11 @@
 const dotenv = require("dotenv");
-const envConfig = dotenv.config({ path: process.env.WORD_ENV_VARS_FILE })
+const envConfig = dotenv.config({ path: process.env.WORD_ENV_VARS_FILE });
 
 if (envConfig.error) {
-  throw envConfig.error
+  throw envConfig.error;
 }
- 
-console.log("GIS | +++ ENV CONFIG LOADED")
+
+console.log("GIS | +++ ENV CONFIG LOADED");
 
 const DEFAULT_PRIMARY_HOST = "google";
 const DEFAULT_DATABASE_HOST = "mms3";
@@ -27,10 +27,10 @@ let configuration = {};
 configuration.randomSeedFlag = DEFAULT_RANDOM_SEED_FLAG;
 configuration.primaryHost = process.env.PRIMARY_HOST || DEFAULT_PRIMARY_HOST;
 configuration.databaseHost = process.env.DATABASE_HOST || DEFAULT_DATABASE_HOST;
-configuration.isPrimaryHost = (hostname === configuration.primaryHost);
-configuration.isDatabaseHost = (hostname === configuration.databaseHost);
+configuration.isPrimaryHost = hostname === configuration.primaryHost;
+configuration.isDatabaseHost = hostname === configuration.databaseHost;
 
-const MAX_TEST_INPUTS = 10000
+const MAX_TEST_INPUTS = 10000;
 
 const MODULE_NAME = "generateInputSets";
 const MODULE_ID_PREFIX = "GIS";
@@ -50,7 +50,7 @@ const DEFAULT_USER_DESCRIPTION_ONLY_FLAG = false;
 const DEFAULT_VERBOSE_MODE = false;
 
 const ONE_SECOND = 1000;
-const ONE_MINUTE = ONE_SECOND*60;
+const ONE_MINUTE = ONE_SECOND * 60;
 
 const GLOBAL_TEST_MODE = false; // applies to parent and all children
 const STATS_UPDATE_INTERVAL = ONE_MINUTE;
@@ -90,7 +90,6 @@ const DEFAULT_MAX_INPUTS_GENERATED = 2000;
 const DEFAULT_MAX_NUM_INPUTS_PER_TYPE = 200;
 const DEFAULT_MIN_NUM_INPUTS_PER_TYPE = 100;
 
-
 configuration.verbose = DEFAULT_VERBOSE_MODE;
 
 configuration.inputsFilePrefix = DEFAULT_INPUTS_FILE_PREFIX;
@@ -113,13 +112,13 @@ configuration.maxInputsGenerated = DEFAULT_MAX_INPUTS_GENERATED;
 configuration.minNumInputsPerType = DEFAULT_MIN_NUM_INPUTS_PER_TYPE;
 configuration.maxNumInputsPerType = DEFAULT_MAX_NUM_INPUTS_PER_TYPE;
 
-configuration.keepaliveInterval = Number(ONE_MINUTE)+1;
+configuration.keepaliveInterval = Number(ONE_MINUTE) + 1;
 configuration.quitOnComplete = true;
 
 global.wordAssoDb = require("@threeceelabs/mongoose-twitter");
 
 const tcuChildName = MODULE_ID_PREFIX + "_TCU";
-const ThreeceeUtilities = require("@threeceelabs/threecee-utilities");
+const ThreeceeUtilities = require("@threeceelabs/threeceeutilities");
 const tcUtils = new ThreeceeUtilities(tcuChildName);
 
 const mguAppName = MODULE_ID_PREFIX + "_MGU";
@@ -129,10 +128,10 @@ const mgUtils = new MongooseUtilities(mguAppName);
 mgUtils.on("ready", async () => {
   console.log(`${MODULE_ID_PREFIX} | +++ MONGOOSE UTILS READY: ${mguAppName}`);
   statsObj.dbConnectionReady = true;
-})
+});
 
 const moment = require("moment");
-const random = require("random")
+const random = require("random");
 
 let defaultConfiguration = {}; // general configuration for TFE
 let hostConfiguration = {}; // host-specific configuration for TFE
@@ -140,31 +139,31 @@ let hostConfiguration = {}; // host-specific configuration for TFE
 const DEFAULT_TWEETS_INPUT_TYPES = [
   "emoji",
   "friends",
-  "hashtags",  
-  "images", 
-  "locations", 
-  "media", 
-  "ngrams", 
-  "places", 
-  "sentiment", 
-  "urls", 
-  "userMentions", 
-  "words"
+  "hashtags",
+  "images",
+  "locations",
+  "media",
+  "ngrams",
+  "places",
+  "sentiment",
+  "urls",
+  "userMentions",
+  "words",
 ];
 
 DEFAULT_TWEETS_INPUT_TYPES.sort();
 
 const USER_PROFILE_INPUT_TYPES = [
   "emoji",
-  "hashtags",  
-  "images", 
-  "locations", 
-  "ngrams", 
-  "places", 
-  "sentiment", 
-  "urls", 
-  "userMentions", 
-  "words"
+  "hashtags",
+  "images",
+  "locations",
+  "ngrams",
+  "places",
+  "sentiment",
+  "urls",
+  "userMentions",
+  "words",
 ];
 
 USER_PROFILE_INPUT_TYPES.sort();
@@ -207,8 +206,7 @@ const defaultInputsConfigFile = "default_networkInputsConfig.json";
 
 if (hostname === "google") {
   DROPBOX_ROOT_FOLDER = "/home/tc/Dropbox/Apps/wordAssociation";
-}
-else {
+} else {
   DROPBOX_ROOT_FOLDER = "/Users/tc/Dropbox/Apps/wordAssociation";
 }
 
@@ -217,21 +215,32 @@ else {
 // ==================================================================
 configuration.DROPBOX = {};
 
-configuration.DROPBOX.DROPBOX_CONFIG_FILE = process.env.DROPBOX_CONFIG_FILE || MODULE_NAME + "Config.json";
-configuration.DROPBOX.DROPBOX_STATS_FILE = process.env.DROPBOX_STATS_FILE || MODULE_NAME + "Stats.json";
+configuration.DROPBOX.DROPBOX_CONFIG_FILE =
+  process.env.DROPBOX_CONFIG_FILE || MODULE_NAME + "Config.json";
+configuration.DROPBOX.DROPBOX_STATS_FILE =
+  process.env.DROPBOX_STATS_FILE || MODULE_NAME + "Stats.json";
 
-const configDefaultFolder = path.join(DROPBOX_ROOT_FOLDER, "config/utility/default");
-const configHostFolder = path.join(DROPBOX_ROOT_FOLDER, "config/utility", hostname);
+const configDefaultFolder = path.join(
+  DROPBOX_ROOT_FOLDER,
+  "config/utility/default"
+);
+const configHostFolder = path.join(
+  DROPBOX_ROOT_FOLDER,
+  "config/utility",
+  hostname
+);
 
-const configDefaultFile = "default_" + configuration.DROPBOX.DROPBOX_CONFIG_FILE;
-const configHostFile = hostname + "_" + configuration.DROPBOX.DROPBOX_CONFIG_FILE;
+const configDefaultFile =
+  "default_" + configuration.DROPBOX.DROPBOX_CONFIG_FILE;
+const configHostFile =
+  hostname + "_" + configuration.DROPBOX.DROPBOX_CONFIG_FILE;
 
 //=========================================================================
 // SLACK
 //=========================================================================
-const { WebClient } = require('@slack/web-api');
+const { WebClient } = require("@slack/web-api");
 
-console.log("process.env.SLACK_BOT_TOKEN: ", process.env.SLACK_BOT_TOKEN)
+console.log("process.env.SLACK_BOT_TOKEN: ", process.env.SLACK_BOT_TOKEN);
 const slackBotToken = process.env.SLACK_BOT_TOKEN;
 
 const slackWebClient = new WebClient(slackBotToken);
@@ -240,9 +249,8 @@ const slackChannel = "gis";
 
 const channelsHashMap = new HashMap();
 
-async function slackSendWebMessage(msgObj){
-  try{
-
+async function slackSendWebMessage(msgObj) {
+  try {
     const channel = msgObj.channel || configuration.slackChannel.id;
     const text = msgObj.text || msgObj;
 
@@ -250,57 +258,55 @@ async function slackSendWebMessage(msgObj){
       text: text,
       channel: channel,
     });
-
-  }
-  catch(err){
-    console.log(chalkAlert(MODULE_ID_PREFIX + " | *** slackSendWebMessage ERROR: " + err));
+  } catch (err) {
+    console.log(
+      chalkAlert(MODULE_ID_PREFIX + " | *** slackSendWebMessage ERROR: " + err)
+    );
     throw err;
   }
 }
 
-async function initSlackWebClient(){
+async function initSlackWebClient() {
   try {
+    console.log(chalkLog(MODULE_ID + " | INIT SLACK WEB CLIENT"));
 
-    console.log(chalkLog(MODULE_ID + " | INIT SLACK WEB CLIENT"))
+    const authTestResponse = await slackWebClient.auth.test();
 
-    const authTestResponse = await slackWebClient.auth.test()
-
-    console.log({authTestResponse})
+    console.log({ authTestResponse });
 
     const conversationsListResponse = await slackWebClient.conversations.list();
 
-    conversationsListResponse.channels.forEach(async function(channel){
-
-      debug(chalkLog("TNN | SLACK CHANNEL | " + channel.id + " | " + channel.name));
+    conversationsListResponse.channels.forEach(async function (channel) {
+      debug(
+        chalkLog("TNN | SLACK CHANNEL | " + channel.id + " | " + channel.name)
+      );
 
       if (channel.name === slackChannel) {
         configuration.slackChannel = channel;
 
         const message = {
           channel: configuration.slackChannel.id,
-          text: "OP"
+          text: "OP",
         };
 
         message.attachments = [];
         message.attachments.push({
-          text: "INIT", 
-          fields: [ 
-            { title: "SRC", value: hostname + "_" + process.pid }, 
-            { title: "MOD", value: MODULE_NAME }, 
-            { title: "DST", value: "ALL" } 
-          ]
+          text: "INIT",
+          fields: [
+            { title: "SRC", value: hostname + "_" + process.pid },
+            { title: "MOD", value: MODULE_NAME },
+            { title: "DST", value: "ALL" },
+          ],
         });
 
         await slackWebClient.chat.postMessage(message);
       }
 
       channelsHashMap.set(channel.id, channel);
-
     });
 
     return;
-  }
-  catch(err){
+  } catch (err) {
     console.log(chalkError("TNN | *** INIT SLACK WEB CLIENT ERROR: " + err));
     throw err;
   }
@@ -317,17 +323,19 @@ globalInputsObj.inputs = {};
 
 let stdin;
 
-const defaultInputsFolder = path.join(configDefaultFolder, "inputs"); 
-const localInputsFolder = path.join(configHostFolder, "inputs"); 
+const defaultInputsFolder = path.join(configDefaultFolder, "inputs");
+const localInputsFolder = path.join(configHostFolder, "inputs");
 
-let inFolder = (configuration.isDatabaseHost) ? defaultInputsFolder : localInputsFolder;
+let inFolder = configuration.isDatabaseHost
+  ? defaultInputsFolder
+  : localInputsFolder;
 
-const defaultHistogramsFolder = path.join(configDefaultFolder, "histograms"); 
-const testHistogramsFolder = path.join(configDefaultFolder, "histograms_test"); 
+const defaultHistogramsFolder = path.join(configDefaultFolder, "histograms");
+const testHistogramsFolder = path.join(configDefaultFolder, "histograms_test");
 
 let histogramsRootFolder = defaultHistogramsFolder;
 
-const statsFolder = path.join(DROPBOX_ROOT_FOLDER, "stats", hostname); 
+const statsFolder = path.join(DROPBOX_ROOT_FOLDER, "stats", hostname);
 const statsFile = configuration.DROPBOX.DROPBOX_STATS_FILE;
 
 const statsObj = {};
@@ -340,9 +348,12 @@ statsObj.heartbeatsReceived = 0;
 statsObj.lessThanMin = 0;
 statsObj.moreThanMin = 0;
 
-const GIS_RUN_ID = hostname 
-  + "_" + statsObj.startTimeMoment.format(compactDateTimeFormat)
-  + "_" + process.pid;
+const GIS_RUN_ID =
+  hostname +
+  "_" +
+  statsObj.startTimeMoment.format(compactDateTimeFormat) +
+  "_" +
+  process.pid;
 
 statsObj.fetchUsersComplete = false;
 statsObj.runId = GIS_RUN_ID;
@@ -374,45 +385,66 @@ const getTimeStamp = tcUtils.getTimeStamp;
 
 const cla = require("command-line-args");
 
-const userProfileCharCodesOnlyFlag = { 
+const userProfileCharCodesOnlyFlag = {
   name: "userProfileCharCodesOnlyFlag",
   alias: "C",
   type: Boolean,
-  defaultValue: false
+  defaultValue: false,
 };
 
-const minInputsGenerated = { name: "minInputsGenerated", type: Number};
-const maxInputsGenerated = { name: "maxInputsGenerated", type: Number};
+const minInputsGenerated = { name: "minInputsGenerated", type: Number };
+const maxInputsGenerated = { name: "maxInputsGenerated", type: Number };
 
-const minDominantMin = { name: "minDominantMin", type: Number};
-const maxDominantMin = { name: "maxDominantMin", type: Number};
+const minDominantMin = { name: "minDominantMin", type: Number };
+const maxDominantMin = { name: "maxDominantMin", type: Number };
 
-const minTotalMin = { name: "minTotalMin", type: Number};
+const minTotalMin = { name: "minTotalMin", type: Number };
 
-const enableStdin = { name: "enableStdin", alias: "i", type: Boolean, defaultValue: true};
-const quitOnComplete = { name: "quitOnComplete", alias: "Q", type: Boolean, defaultValue: false};
-const quitOnError = { name: "quitOnError", alias: "q", type: Boolean, defaultValue: true};
-const testMode = { name: "testMode", alias: "X", type: Boolean, defaultValue: false};
+const enableStdin = {
+  name: "enableStdin",
+  alias: "i",
+  type: Boolean,
+  defaultValue: true,
+};
+const quitOnComplete = {
+  name: "quitOnComplete",
+  alias: "Q",
+  type: Boolean,
+  defaultValue: false,
+};
+const quitOnError = {
+  name: "quitOnError",
+  alias: "q",
+  type: Boolean,
+  defaultValue: true,
+};
+const testMode = {
+  name: "testMode",
+  alias: "X",
+  type: Boolean,
+  defaultValue: false,
+};
 
 const optionDefinitions = [
   userProfileCharCodesOnlyFlag,
   minInputsGenerated,
   maxInputsGenerated,
-  minTotalMin, 
-  minDominantMin, 
-  maxDominantMin, 
-  enableStdin, 
-  quitOnComplete, 
-  quitOnError, 
-  testMode
+  minTotalMin,
+  minDominantMin,
+  maxDominantMin,
+  enableStdin,
+  quitOnComplete,
+  quitOnError,
+  testMode,
 ];
 
 const commandLineConfig = cla(optionDefinitions);
 
-console.log(chalkInfo("GIS | COMMAND LINE CONFIG\n" + jsonPrint(commandLineConfig)));
+console.log(
+  chalkInfo("GIS | COMMAND LINE CONFIG\n" + jsonPrint(commandLineConfig))
+);
 
 console.log("GIS | COMMAND LINE OPTIONS\n" + jsonPrint(commandLineConfig));
-
 
 process.title = "node_generateInputSets";
 console.log("\n\nGIS | =================================");
@@ -420,61 +452,64 @@ console.log("GIS | HOST:          " + hostname);
 console.log("GIS | PROCESS TITLE: " + process.title);
 console.log("GIS | PROCESS ID:    " + process.pid);
 console.log("GIS | RUN ID:        " + statsObj.runId);
-console.log("GIS | PROCESS ARGS   " + util.inspect(process.argv, {showHidden: false, depth: 1}));
+console.log(
+  "GIS | PROCESS ARGS   " +
+    util.inspect(process.argv, { showHidden: false, depth: 1 })
+);
 console.log("GIS | =================================");
 
-process.on("exit", function() {
-});
+process.on("exit", function () {});
 
-process.on("message", function(msg) {
-
-  if ((msg === "SIGINT") || (msg === "shutdown")) {
-
-    debug("\n\n!!!!! RECEIVED PM2 SHUTDOWN !!!!!\n\n***** Closing all connections *****\n\n");
+process.on("message", function (msg) {
+  if (msg === "SIGINT" || msg === "shutdown") {
+    debug(
+      "\n\n!!!!! RECEIVED PM2 SHUTDOWN !!!!!\n\n***** Closing all connections *****\n\n"
+    );
 
     clearInterval(statsUpdateInterval);
 
-    setTimeout(function() {
+    setTimeout(function () {
       showStats();
       console.log("GIS | QUITTING generateInputSets");
       process.exit(0);
     }, 300);
-
   }
 });
 
-function showStats(){
-
+function showStats() {
   statsObj.elapsed = moment().diff(statsObj.startTimeMoment);
   statsObj.timeStamp = moment().format(compactDateTimeFormat);
 
-  console.log(chalkLog("\nGIS | STATS"
-    + " | E: " + tcUtils.msToTime(statsObj.elapsed)
-    + " | S: " + statsObj.startTimeMoment.format(compactDateTimeFormat)
-  ));
+  console.log(
+    chalkLog(
+      "\nGIS | STATS" +
+        " | E: " +
+        tcUtils.msToTime(statsObj.elapsed) +
+        " | S: " +
+        statsObj.startTimeMoment.format(compactDateTimeFormat)
+    )
+  );
 }
 
-const inputsDefault = function (inputsObj){
+const inputsDefault = function (inputsObj) {
   return inputsObj;
 };
 
 function printInputsObj(title, iObj) {
-
   const inputsObj = inputsDefault(iObj);
 
-  console.log(chalkBlue(title
-    + " | " + inputsObj.inputsId
-    + "\n" + jsonPrint(inputsObj.meta)
-  ));
+  console.log(
+    chalkBlue(
+      title + " | " + inputsObj.inputsId + "\n" + jsonPrint(inputsObj.meta)
+    )
+  );
 }
 
 function sortedHashmap(params) {
-
-  return new Promise(function(resolve, reject) {
-
+  return new Promise(function (resolve, reject) {
     const keys = Object.keys(params.hashmap);
 
-    let sortedKeys = keys.sort(function(a,b){
+    let sortedKeys = keys.sort(function (a, b) {
       const objAvalue = dot.pick(params.sortKey, params.hashmap[a]);
       const objBvalue = dot.pick(params.sortKey, params.hashmap[b]);
       return objBvalue - objAvalue;
@@ -482,60 +517,69 @@ function sortedHashmap(params) {
 
     if (keys !== undefined) {
       if (sortedKeys !== undefined) {
+        if (params.randomSeedFlag) {
+          sortedKeys = _.shuffle(sortedKeys);
+        }
 
-        if (params.randomSeedFlag) { sortedKeys = _.shuffle(sortedKeys); }
-
-        resolve({sortKey: params.sortKey, sortedKeys: sortedKeys.slice(0,params.max)});
+        resolve({
+          sortKey: params.sortKey,
+          sortedKeys: sortedKeys.slice(0, params.max),
+        });
+      } else {
+        console.log(
+          chalkAlert(
+            "sortedHashmap NO SORTED KEYS? | SORT KEY: " +
+              params.sortKey +
+              " | KEYS: " +
+              keys.length +
+              " | SORTED KEYS: " +
+              sortedKeys.length
+          )
+        );
+        resolve({ sortKey: params.sortKey, sortedKeys: [] });
       }
-      else {
-        console.log(chalkAlert("sortedHashmap NO SORTED KEYS? | SORT KEY: " + params.sortKey 
-          + " | KEYS: " + keys.length 
-          + " | SORTED KEYS: " + sortedKeys.length
-        ));
-        resolve({sortKey: params.sortKey, sortedKeys: []});
-      }
-
-    }
-    else {
+    } else {
       console.error("sortedHashmap ERROR | params\n" + jsonPrint(params));
       reject(new Error("sortedHashmap ERROR | keys UNDEFINED"));
     }
-
   });
 }
 
 const entryDefaults = {
-  "total": 0,
-  "left": 0,
-  "leftRatio": 0,
-  "neutral": 0,
-  "neutralRatio": 0,
-  "right": 0,
-  "rightRatio": 0,
-  "positive": 0,
-  "positiveRatio": 0,
-  "negative": 0,
-  "negativeRatio": 0,
-  "none": 0,
-  "uncategorized": 0
+  total: 0,
+  left: 0,
+  leftRatio: 0,
+  neutral: 0,
+  neutralRatio: 0,
+  right: 0,
+  rightRatio: 0,
+  positive: 0,
+  positiveRatio: 0,
+  negative: 0,
+  negativeRatio: 0,
+  none: 0,
+  uncategorized: 0,
 };
 
 const ratioCategories = ["left", "neutral", "right"];
 
-function computeRatios(entry){
-  for(const category of ratioCategories){
+function computeRatios(entry) {
+  for (const category of ratioCategories) {
     const catValue = entry[category] || 0;
-    entry[category + "Ratio"] = catValue/entry.total;
+    entry[category + "Ratio"] = catValue / entry.total;
   }
   return entry;
 }
 
 function generateInputSets(params) {
-
-  return new Promise(function(resolve, reject){
-
+  return new Promise(function (resolve, reject) {
     const newInputsObj = {};
-    newInputsObj.inputsId = hostname + "_" + process.pid + "_" + moment().format(compactDateTimeFormat);
+    newInputsObj.inputsId =
+      hostname +
+      "_" +
+      process.pid +
+      "_" +
+      moment().format(compactDateTimeFormat);
     newInputsObj.meta = {};
     newInputsObj.meta.type = {};
     newInputsObj.meta.numInputs = 0;
@@ -544,129 +588,156 @@ function generateInputSets(params) {
 
     const inTypes = [params.type];
 
-    async.eachSeries(inTypes, async function(type){
+    async.eachSeries(
+      inTypes,
+      async function (type) {
+        let minDominantMin =
+          params.minDominantMin && params.minDominantMin[type] === undefined
+            ? params.minDominantMin
+            : configuration.minDominantMin;
 
-      let minDominantMin = (params.minDominantMin && (params.minDominantMin[type] === undefined)) ? params.minDominantMin : configuration.minDominantMin;
-      
-      minDominantMin = (params.minDominantMin && params.minDominantMin[type]) ? params.minDominantMin[type] : minDominantMin;
+        minDominantMin =
+          params.minDominantMin && params.minDominantMin[type]
+            ? params.minDominantMin[type]
+            : minDominantMin;
 
-      const totalTypeInputs = Object.keys(params.histogramsObj.histograms[type]).length;
+        const totalTypeInputs = Object.keys(
+          params.histogramsObj.histograms[type]
+        ).length;
 
-      newInputsObj.meta.type[type] = {};
+        newInputsObj.meta.type[type] = {};
 
-      // start with zero inputs of type if more than configuration.minNumInputsPerType
-      newInputsObj.meta.type[type].numInputs = (totalTypeInputs > configuration.minNumInputsPerType) ? 0 : totalTypeInputs;
-      newInputsObj.meta.type[type].underMinNumInputs = null;
-      newInputsObj.meta.type[type].overMaxNumInputs = null;
-      newInputsObj.meta.type[type].currentMaxNumInputs = 0;
+        // start with zero inputs of type if more than configuration.minNumInputsPerType
+        newInputsObj.meta.type[type].numInputs =
+          totalTypeInputs > configuration.minNumInputsPerType
+            ? 0
+            : totalTypeInputs;
+        newInputsObj.meta.type[type].underMinNumInputs = null;
+        newInputsObj.meta.type[type].overMaxNumInputs = null;
+        newInputsObj.meta.type[type].currentMaxNumInputs = 0;
 
-      newInputsObj.inputs[type] = [];
-      newInputsObj.inputsMinimum[type] = [];
+        newInputsObj.inputs[type] = [];
+        newInputsObj.inputsMinimum[type] = [];
 
-      if (totalTypeInputs === 0) {
-        return;
-      }
-
-      let results = {};
-
-      try {
-
-        results = await sortedHashmap({
-          randomSeedFlag: configuration.randomSeedFlag, 
-          sortKey: "total", 
-          hashmap: params.histogramsObj.histograms[type], 
-          max: 10000
-        });
-
-        async.eachSeries(results.sortedKeys, function(input, cb){
-
-          // "total": 2,
-          // "left": 2,
-          // "leftRatio": 1,
-          // "neutral": 0,
-          // "neutralRatio": 0,
-          // "right": 0,
-          // "rightRatio": 0,
-          // "positive": 0,
-          // "positiveRatio": 0,
-          // "negative": 0,
-          // "negativeRatio": 0,
-          // "none": 0,
-          // "uncategorized": 0
-
-          let entry = defaults(params.histogramsObj.histograms[type][input], entryDefaults);
-          entry = computeRatios(entry);
-
-          if (
-               (entry.leftRatio >= minDominantMin)
-            || (entry.neutralRatio >= minDominantMin)
-            || (entry.rightRatio >= minDominantMin)
-            ) 
-          {
-
-            newInputsObj.inputs[type].push(input);
-
-          }
-
-          cb();
-
-        }, function(err){
-
-          if (err && (err !== "MAX")){
-            console.log(chalkError("GIS | *** SORTED HASHMAP ERROR:", err));
-            return err;
-          }
-
-          const tempShuffledArray = _.shuffle(newInputsObj.inputs[type]);
-
-          if (tempShuffledArray.length >= configuration.maxNumInputsPerType) {
-            console.log(chalkAlert("GIS | " + type.toUpperCase()
-              + " | MAX INPUTS EXCEEDED: " + tempShuffledArray.length 
-              + " | SLICING TO: " + configuration.maxNumInputsPerType
-            ));
-          }
-
-          newInputsObj.inputs[type] = tempShuffledArray.slice(0, configuration.maxNumInputsPerType);
-
-          newInputsObj.inputs[type].sort();
-
-          newInputsObj.meta.type[type].numInputs = newInputsObj.inputs[type].length;
-
-          console.log(chalkBlue("GIS | " + type.toUpperCase() + " | " + newInputsObj.meta.type[type].numInputs + " INPUTS"));
+        if (totalTypeInputs === 0) {
           return;
-        });
+        }
 
+        let results = {};
+
+        try {
+          results = await sortedHashmap({
+            randomSeedFlag: configuration.randomSeedFlag,
+            sortKey: "total",
+            hashmap: params.histogramsObj.histograms[type],
+            max: 10000,
+          });
+
+          async.eachSeries(
+            results.sortedKeys,
+            function (input, cb) {
+              // "total": 2,
+              // "left": 2,
+              // "leftRatio": 1,
+              // "neutral": 0,
+              // "neutralRatio": 0,
+              // "right": 0,
+              // "rightRatio": 0,
+              // "positive": 0,
+              // "positiveRatio": 0,
+              // "negative": 0,
+              // "negativeRatio": 0,
+              // "none": 0,
+              // "uncategorized": 0
+
+              let entry = defaults(
+                params.histogramsObj.histograms[type][input],
+                entryDefaults
+              );
+              entry = computeRatios(entry);
+
+              if (
+                entry.leftRatio >= minDominantMin ||
+                entry.neutralRatio >= minDominantMin ||
+                entry.rightRatio >= minDominantMin
+              ) {
+                newInputsObj.inputs[type].push(input);
+              }
+
+              cb();
+            },
+            function (err) {
+              if (err && err !== "MAX") {
+                console.log(chalkError("GIS | *** SORTED HASHMAP ERROR:", err));
+                return err;
+              }
+
+              const tempShuffledArray = _.shuffle(newInputsObj.inputs[type]);
+
+              if (
+                tempShuffledArray.length >= configuration.maxNumInputsPerType
+              ) {
+                console.log(
+                  chalkAlert(
+                    "GIS | " +
+                      type.toUpperCase() +
+                      " | MAX INPUTS EXCEEDED: " +
+                      tempShuffledArray.length +
+                      " | SLICING TO: " +
+                      configuration.maxNumInputsPerType
+                  )
+                );
+              }
+
+              newInputsObj.inputs[type] = tempShuffledArray.slice(
+                0,
+                configuration.maxNumInputsPerType
+              );
+
+              newInputsObj.inputs[type].sort();
+
+              newInputsObj.meta.type[type].numInputs =
+                newInputsObj.inputs[type].length;
+
+              console.log(
+                chalkBlue(
+                  "GIS | " +
+                    type.toUpperCase() +
+                    " | " +
+                    newInputsObj.meta.type[type].numInputs +
+                    " INPUTS"
+                )
+              );
+              return;
+            }
+          );
+        } catch (err) {
+          console.log(chalkError("GIS | *** SORTED HASHMAP ERROR:", err));
+          return err;
+        }
+      },
+      function (err) {
+        if (err) {
+          console.log("GIS | ERROR:", err);
+          return reject(err);
+        }
+        resolve(newInputsObj);
       }
-      catch(err){
-        console.log(chalkError("GIS | *** SORTED HASHMAP ERROR:", err));
-        return err;
-      }
-
-
-    }, function(err){
-      if (err) { 
-        console.log("GIS | ERROR:", err);
-        return reject(err); 
-      }
-      resolve(newInputsObj);
-    });
-
+    );
   });
 }
 
 let quitWaitInterval;
 
-function quit(cause){
-
-  console.log( "\nGIS | ... QUITTING ..." );
+function quit(cause) {
+  console.log("\nGIS | ... QUITTING ...");
 
   if (cause) {
-    console.log( "GIS | CAUSE: " + cause );
+    console.log("GIS | CAUSE: " + cause);
   }
 
   quitWaitInterval = setInterval(function () {
-
-    if (cause === "Q"){
+    if (cause === "Q") {
       statsObj.elapsed = moment().diff(statsObj.startTimeMoment);
 
       clearInterval(statsUpdateInterval);
@@ -674,12 +745,10 @@ function quit(cause){
 
       console.log(chalkAlert("\nGIS | *** FORCE QUITTING"));
 
-      setTimeout(function(){
-        process.exit();      
+      setTimeout(function () {
+        process.exit();
       }, 1000);
-    }
-    else {
-
+    } else {
       statsObj.elapsed = moment().diff(statsObj.startTimeMoment);
 
       clearInterval(statsUpdateInterval);
@@ -687,29 +756,31 @@ function quit(cause){
 
       console.log(chalkAlert("\nGIS | ALL PROCESSES COMPLETE ... QUITTING"));
 
-      setTimeout(function(){
-        process.exit();      
+      setTimeout(function () {
+        process.exit();
       }, 1000);
-
     }
-
   }, 1000);
 }
 
-process.on( "SIGINT", function() {
+process.on("SIGINT", function () {
   quit("SIGINT");
 });
 
-function getElapsedTimeStamp(){
+function getElapsedTimeStamp() {
   statsObj.elapsedMS = moment().valueOf() - statsObj.startTimeMoment.valueOf();
   return tcUtils.msToTime(statsObj.elapsedMS);
 }
 
 function initStatsUpdate() {
-
-  return new Promise(function(resolve){
-
-    console.log(chalkLog(MODULE_ID_PREFIX + " | INIT STATS UPDATE INTERVAL | " + tcUtils.msToTime(configuration.statsUpdateIntervalTime)));
+  return new Promise(function (resolve) {
+    console.log(
+      chalkLog(
+        MODULE_ID_PREFIX +
+          " | INIT STATS UPDATE INTERVAL | " +
+          tcUtils.msToTime(configuration.statsUpdateIntervalTime)
+      )
+    );
 
     statsObj.elapsed = getElapsedTimeStamp();
     statsObj.timeStamp = getTimeStamp();
@@ -717,109 +788,132 @@ function initStatsUpdate() {
     clearInterval(statsUpdateInterval);
 
     statsUpdateInterval = setInterval(async function () {
-
       statsObj.elapsed = getElapsedTimeStamp();
       statsObj.timeStamp = getTimeStamp();
 
-      try{
-        await tcUtils.saveFile({folder: statsFolder, file: statsFile, obj: statsObj});
+      try {
+        await tcUtils.saveFile({
+          folder: statsFolder,
+          file: statsFile,
+          obj: statsObj,
+        });
         await showStats();
+      } catch (err) {
+        console.log(
+          chalkError(MODULE_ID_PREFIX + " | *** SHOW STATS ERROR: " + err)
+        );
       }
-      catch(err){
-        console.log(chalkError(MODULE_ID_PREFIX + " | *** SHOW STATS ERROR: " + err));
-      }
-      
     }, configuration.statsUpdateIntervalTime);
 
     resolve();
-
   });
 }
 
-function initStdIn(){
-
+function initStdIn() {
   console.log("STDIN ENABLED");
 
   stdin = process.stdin;
-  if(stdin.setRawMode !== undefined) {
-    stdin.setRawMode( true );
+  if (stdin.setRawMode !== undefined) {
+    stdin.setRawMode(true);
   }
   stdin.resume();
-  stdin.setEncoding( "utf8" );
-  stdin.on( "data", function( key ){
-
+  stdin.setEncoding("utf8");
+  stdin.on("data", function (key) {
     switch (key) {
       case "\u0003":
         process.exit();
-      break;
+        break;
       case "q":
       case "Q":
         quit(key);
-      break;
+        break;
       case "s":
         showStats();
-      break;
+        break;
       case "S":
         showStats(true);
-      break;
+        break;
       default:
         console.log(
-          "\n" + "q/Q: quit"
-          + "\n" + "s: showStats"
-          + "\n" + "S: showStats verbose"
-          );
+          "\n" +
+            "q/Q: quit" +
+            "\n" +
+            "s: showStats" +
+            "\n" +
+            "S: showStats verbose"
+        );
     }
   });
 }
 
-function loadCommandLineArgs(){
-
-  return new Promise(function(resolve){
-
+function loadCommandLineArgs() {
+  return new Promise(function (resolve) {
     statsObj.status = "LOAD COMMAND LINE ARGS";
 
     const commandLineConfigKeys = Object.keys(commandLineConfig);
 
-    async.each(commandLineConfigKeys, function(arg, cb){
+    async.each(
+      commandLineConfigKeys,
+      function (arg, cb) {
+        if (arg === "evolveIterations") {
+          configuration.evolve.iterations = commandLineConfig[arg];
+          console.log(
+            MODULE_ID_PREFIX +
+              " | --> COMMAND LINE CONFIG | " +
+              arg +
+              ": " +
+              configuration.evolve.iterations
+          );
+        } else {
+          configuration[arg] = commandLineConfig[arg];
+          console.log(
+            MODULE_ID_PREFIX +
+              " | --> COMMAND LINE CONFIG | " +
+              arg +
+              ": " +
+              configuration[arg]
+          );
+        }
 
-      if (arg === "evolveIterations"){
-        configuration.evolve.iterations = commandLineConfig[arg];
-        console.log(MODULE_ID_PREFIX + " | --> COMMAND LINE CONFIG | " + arg + ": " + configuration.evolve.iterations);
+        cb();
+      },
+      function () {
+        statsObj.commandLineArgsLoaded = true;
+        resolve();
       }
-      else {
-        configuration[arg] = commandLineConfig[arg];
-        console.log(MODULE_ID_PREFIX + " | --> COMMAND LINE CONFIG | " + arg + ": " + configuration[arg]);
-      }
-
-      cb();
-
-    }, function(){
-      statsObj.commandLineArgsLoaded = true;
-      resolve();
-    });
-
+    );
   });
 }
 
 async function loadInputs(params) {
-
   statsObj.status = "LOAD INPUTS CONFIG";
 
   const folder = params.folder;
   const file = params.file;
 
-  console.log(chalkLog("TFE | LOADING INPUTS CONFIG | " + folder + "/" + file + " ..."));
+  console.log(
+    chalkLog("TFE | LOADING INPUTS CONFIG | " + folder + "/" + file + " ...")
+  );
 
   try {
-
-    const inputsConfigObj = await tcUtils.loadFile({folder: folder, file: file, noErrorNotFound: params.noErrorNotFound});
+    const inputsConfigObj = await tcUtils.loadFile({
+      folder: folder,
+      file: file,
+      noErrorNotFound: params.noErrorNotFound,
+    });
 
     if (!inputsConfigObj) {
       if (params.noErrorNotFound) {
-        console.log(chalkAlert("TFE | !!! LOAD INPUTS CONFIG FILE ERROR | FILE NOT FOUND "));
+        console.log(
+          chalkAlert(
+            "TFE | !!! LOAD INPUTS CONFIG FILE ERROR | FILE NOT FOUND "
+          )
+        );
         return;
       }
-      console.log(chalkError("TFE | LOAD INPUTS CONFIG FILE ERROR | JSON UNDEFINED ??? "));
+      console.log(
+        chalkError("TFE | LOAD INPUTS CONFIG FILE ERROR | JSON UNDEFINED ??? ")
+      );
       throw new Error("LOAD INPUTS CONFIG FILE ERROR | JSON UNDEFINED");
     }
 
@@ -829,17 +923,25 @@ async function loadInputs(params) {
       inputsIdSet.add(inputsId);
     }
 
-    console.log(chalkBlue("TFE | LOADED INPUTS CONFIG"
-      + "\nTFE | CURRENT FILE INPUTS IDS SET: " + tempInputsIdSet.size + " INPUTS IDS"
-      + "\n" + jsonPrint([...tempInputsIdSet])
-      + "\nTFE | FINAL INPUTS IDS SET: " + inputsIdSet.size + " INPUTS IDS"
-      + "\n" + jsonPrint([...inputsIdSet])
-    ));
+    console.log(
+      chalkBlue(
+        "TFE | LOADED INPUTS CONFIG" +
+          "\nTFE | CURRENT FILE INPUTS IDS SET: " +
+          tempInputsIdSet.size +
+          " INPUTS IDS" +
+          "\n" +
+          jsonPrint([...tempInputsIdSet]) +
+          "\nTFE | FINAL INPUTS IDS SET: " +
+          inputsIdSet.size +
+          " INPUTS IDS" +
+          "\n" +
+          jsonPrint([...inputsIdSet])
+      )
+    );
 
     return;
-  }
-  catch(err){
-    if ((err.status == 409) || (err.status == 404)) {
+  } catch (err) {
+    if (err.status == 409 || err.status == 404) {
       console.log(chalkError("TFE | LOAD INPUTS CONFIG FILE NOT FOUND"));
       return;
     }
@@ -849,11 +951,9 @@ async function loadInputs(params) {
 }
 
 async function loadConfigFile(params) {
-
   const fullPath = path.join(params.folder, params.file);
 
   try {
-
     if (configuration.offlineMode) {
       await loadCommandLineArgs();
       return;
@@ -862,171 +962,323 @@ async function loadConfigFile(params) {
     const newConfiguration = {};
     newConfiguration.evolve = {};
 
-    const loadedConfigObj = await tcUtils.loadFile({folder: params.folder, file: params.file, noErrorNotFound: params.noErrorNotFound });
+    const loadedConfigObj = await tcUtils.loadFile({
+      folder: params.folder,
+      file: params.file,
+      noErrorNotFound: params.noErrorNotFound,
+    });
 
     if (loadedConfigObj === undefined) {
       if (params.noErrorNotFound) {
-        console.log(chalkAlert(MODULE_ID_PREFIX + " | ... SKIP LOAD CONFIG FILE: " + params.folder + "/" + params.file));
+        console.log(
+          chalkAlert(
+            MODULE_ID_PREFIX +
+              " | ... SKIP LOAD CONFIG FILE: " +
+              params.folder +
+              "/" +
+              params.file
+          )
+        );
         return newConfiguration;
-      }
-      else {
-        console.log(chalkError(MODULE_ID_PREFIX + " | *** CONFIG LOAD FILE ERROR | JSON UNDEFINED ??? "));
+      } else {
+        console.log(
+          chalkError(
+            MODULE_ID_PREFIX +
+              " | *** CONFIG LOAD FILE ERROR | JSON UNDEFINED ??? "
+          )
+        );
         throw new Error("JSON UNDEFINED");
       }
     }
 
     if (loadedConfigObj instanceof Error) {
-      console.log(chalkError(MODULE_ID_PREFIX + " | *** CONFIG LOAD FILE ERROR: " + loadedConfigObj));
+      console.log(
+        chalkError(
+          MODULE_ID_PREFIX + " | *** CONFIG LOAD FILE ERROR: " + loadedConfigObj
+        )
+      );
     }
 
-    console.log(chalkInfo(MODULE_ID_PREFIX + " | LOADED CONFIG FILE: " + params.file + "\n" + jsonPrint(loadedConfigObj)));
+    console.log(
+      chalkInfo(
+        MODULE_ID_PREFIX +
+          " | LOADED CONFIG FILE: " +
+          params.file +
+          "\n" +
+          jsonPrint(loadedConfigObj)
+      )
+    );
 
-      if (loadedConfigObj.GIS_GENERATE_BOTH_USER_PROFILE_ONLY_AND_ALL_HISTOGRAMS_INPUTS !== undefined) {
-        console.log(MODULE_ID_PREFIX + " | LOADED GIS_GENERATE_BOTH_USER_PROFILE_ONLY_AND_ALL_HISTOGRAMS_INPUTS: " + loadedConfigObj.GIS_GENERATE_BOTH_USER_PROFILE_ONLY_AND_ALL_HISTOGRAMS_INPUTS);
-        if ((loadedConfigObj.GIS_GENERATE_BOTH_USER_PROFILE_ONLY_AND_ALL_HISTOGRAMS_INPUTS === true) || (loadedConfigObj.GIS_GENERATE_BOTH_USER_PROFILE_ONLY_AND_ALL_HISTOGRAMS_INPUTS === "true")) {
-          newConfiguration.generateBothUserProfileOnlyAndAllHistogramsInputs = true;
-          // GIS_USER_PROFILE_ONLY_FLAG and userProfileOnlyFlag will be ignored
-        }
-        if ((loadedConfigObj.GIS_GENERATE_BOTH_USER_PROFILE_ONLY_AND_ALL_HISTOGRAMS_INPUTS === false) || (loadedConfigObj.GIS_GENERATE_BOTH_USER_PROFILE_ONLY_AND_ALL_HISTOGRAMS_INPUTS === "false")) {
-          newConfiguration.generateBothUserProfileOnlyAndAllHistogramsInputs = false;
-        }
+    if (
+      loadedConfigObj.GIS_GENERATE_BOTH_USER_PROFILE_ONLY_AND_ALL_HISTOGRAMS_INPUTS !==
+      undefined
+    ) {
+      console.log(
+        MODULE_ID_PREFIX +
+          " | LOADED GIS_GENERATE_BOTH_USER_PROFILE_ONLY_AND_ALL_HISTOGRAMS_INPUTS: " +
+          loadedConfigObj.GIS_GENERATE_BOTH_USER_PROFILE_ONLY_AND_ALL_HISTOGRAMS_INPUTS
+      );
+      if (
+        loadedConfigObj.GIS_GENERATE_BOTH_USER_PROFILE_ONLY_AND_ALL_HISTOGRAMS_INPUTS ===
+          true ||
+        loadedConfigObj.GIS_GENERATE_BOTH_USER_PROFILE_ONLY_AND_ALL_HISTOGRAMS_INPUTS ===
+          "true"
+      ) {
+        newConfiguration.generateBothUserProfileOnlyAndAllHistogramsInputs = true;
+        // GIS_USER_PROFILE_ONLY_FLAG and userProfileOnlyFlag will be ignored
       }
+      if (
+        loadedConfigObj.GIS_GENERATE_BOTH_USER_PROFILE_ONLY_AND_ALL_HISTOGRAMS_INPUTS ===
+          false ||
+        loadedConfigObj.GIS_GENERATE_BOTH_USER_PROFILE_ONLY_AND_ALL_HISTOGRAMS_INPUTS ===
+          "false"
+      ) {
+        newConfiguration.generateBothUserProfileOnlyAndAllHistogramsInputs = false;
+      }
+    }
 
-      if (loadedConfigObj.GIS_USER_PROFILE_ONLY_FLAG !== undefined) {
-        console.log(MODULE_ID_PREFIX + " | LOADED GIS_USER_PROFILE_ONLY_FLAG: " + loadedConfigObj.GIS_USER_PROFILE_ONLY_FLAG);
-        if ((loadedConfigObj.GIS_USER_PROFILE_ONLY_FLAG === true) || (loadedConfigObj.GIS_USER_PROFILE_ONLY_FLAG === "true")) {
-          newConfiguration.userProfileOnlyFlag = true;
-        }
-        if ((loadedConfigObj.GIS_USER_PROFILE_ONLY_FLAG === false) || (loadedConfigObj.GIS_USER_PROFILE_ONLY_FLAG === "false")) {
-          newConfiguration.userProfileOnlyFlag = false;
-        }
+    if (loadedConfigObj.GIS_USER_PROFILE_ONLY_FLAG !== undefined) {
+      console.log(
+        MODULE_ID_PREFIX +
+          " | LOADED GIS_USER_PROFILE_ONLY_FLAG: " +
+          loadedConfigObj.GIS_USER_PROFILE_ONLY_FLAG
+      );
+      if (
+        loadedConfigObj.GIS_USER_PROFILE_ONLY_FLAG === true ||
+        loadedConfigObj.GIS_USER_PROFILE_ONLY_FLAG === "true"
+      ) {
+        newConfiguration.userProfileOnlyFlag = true;
       }
+      if (
+        loadedConfigObj.GIS_USER_PROFILE_ONLY_FLAG === false ||
+        loadedConfigObj.GIS_USER_PROFILE_ONLY_FLAG === "false"
+      ) {
+        newConfiguration.userProfileOnlyFlag = false;
+      }
+    }
 
-      if (loadedConfigObj.GIS_RANDOM_SEED_FLAG !== undefined) {
-        console.log(MODULE_ID_PREFIX + " | LOADED GIS_RANDOM_SEED_FLAG: " + loadedConfigObj.GIS_RANDOM_SEED_FLAG);
-        if ((loadedConfigObj.GIS_RANDOM_SEED_FLAG === true) || (loadedConfigObj.GIS_RANDOM_SEED_FLAG === "true")) {
-          newConfiguration.randomSeedFlag = true;
-        }
-        if ((loadedConfigObj.GIS_RANDOM_SEED_FLAG === false) || (loadedConfigObj.GIS_RANDOM_SEED_FLAG === "false")) {
-          newConfiguration.randomSeedFlag = false;
-        }
+    if (loadedConfigObj.GIS_RANDOM_SEED_FLAG !== undefined) {
+      console.log(
+        MODULE_ID_PREFIX +
+          " | LOADED GIS_RANDOM_SEED_FLAG: " +
+          loadedConfigObj.GIS_RANDOM_SEED_FLAG
+      );
+      if (
+        loadedConfigObj.GIS_RANDOM_SEED_FLAG === true ||
+        loadedConfigObj.GIS_RANDOM_SEED_FLAG === "true"
+      ) {
+        newConfiguration.randomSeedFlag = true;
       }
+      if (
+        loadedConfigObj.GIS_RANDOM_SEED_FLAG === false ||
+        loadedConfigObj.GIS_RANDOM_SEED_FLAG === "false"
+      ) {
+        newConfiguration.randomSeedFlag = false;
+      }
+    }
 
-      if (loadedConfigObj.GIS_MAX_NUM_INPUTS_PER_TYPE !== undefined){
-        console.log("GIS | LOADED GIS_MAX_NUM_INPUTS_PER_TYPE: " + loadedConfigObj.GIS_MAX_NUM_INPUTS_PER_TYPE);
-        newConfiguration.maxNumInputsPerType = loadedConfigObj.GIS_MAX_NUM_INPUTS_PER_TYPE;
-      }
+    if (loadedConfigObj.GIS_MAX_NUM_INPUTS_PER_TYPE !== undefined) {
+      console.log(
+        "GIS | LOADED GIS_MAX_NUM_INPUTS_PER_TYPE: " +
+          loadedConfigObj.GIS_MAX_NUM_INPUTS_PER_TYPE
+      );
+      newConfiguration.maxNumInputsPerType =
+        loadedConfigObj.GIS_MAX_NUM_INPUTS_PER_TYPE;
+    }
 
-      if (loadedConfigObj.GIS_MIN_NUM_INPUTS_PER_TYPE !== undefined){
-        console.log("GIS | LOADED GIS_MIN_NUM_INPUTS_PER_TYPE: " + loadedConfigObj.GIS_MIN_NUM_INPUTS_PER_TYPE);
-        newConfiguration.minNumInputsPerType = loadedConfigObj.GIS_MIN_NUM_INPUTS_PER_TYPE;
-      }
+    if (loadedConfigObj.GIS_MIN_NUM_INPUTS_PER_TYPE !== undefined) {
+      console.log(
+        "GIS | LOADED GIS_MIN_NUM_INPUTS_PER_TYPE: " +
+          loadedConfigObj.GIS_MIN_NUM_INPUTS_PER_TYPE
+      );
+      newConfiguration.minNumInputsPerType =
+        loadedConfigObj.GIS_MIN_NUM_INPUTS_PER_TYPE;
+    }
 
-      if (loadedConfigObj.GIS_INPUTS_FILE_PREFIX !== undefined){
-        console.log("GIS | LOADED GIS_INPUTS_FILE_PREFIX: " + loadedConfigObj.GIS_INPUTS_FILE_PREFIX);
-        newConfiguration.inputsFilePrefix = loadedConfigObj.GIS_INPUTS_FILE_PREFIX;
-      }
+    if (loadedConfigObj.GIS_INPUTS_FILE_PREFIX !== undefined) {
+      console.log(
+        "GIS | LOADED GIS_INPUTS_FILE_PREFIX: " +
+          loadedConfigObj.GIS_INPUTS_FILE_PREFIX
+      );
+      newConfiguration.inputsFilePrefix =
+        loadedConfigObj.GIS_INPUTS_FILE_PREFIX;
+    }
 
-      if (loadedConfigObj.GIS_MAX_ITERATIONS !== undefined){
-        console.log("GIS | LOADED GIS_MAX_ITERATIONS: " + loadedConfigObj.GIS_MAX_ITERATIONS);
-        newConfiguration.maxIterations = loadedConfigObj.GIS_MAX_ITERATIONS;
-      }
+    if (loadedConfigObj.GIS_MAX_ITERATIONS !== undefined) {
+      console.log(
+        "GIS | LOADED GIS_MAX_ITERATIONS: " + loadedConfigObj.GIS_MAX_ITERATIONS
+      );
+      newConfiguration.maxIterations = loadedConfigObj.GIS_MAX_ITERATIONS;
+    }
 
-      if (loadedConfigObj.GIS_MIN_INPUTS_GENERATED !== undefined){
-        console.log("GIS | LOADED GIS_MIN_INPUTS_GENERATED: " + loadedConfigObj.GIS_MIN_INPUTS_GENERATED);
-        newConfiguration.minInputsGenerated = loadedConfigObj.GIS_MIN_INPUTS_GENERATED;
-      }
+    if (loadedConfigObj.GIS_MIN_INPUTS_GENERATED !== undefined) {
+      console.log(
+        "GIS | LOADED GIS_MIN_INPUTS_GENERATED: " +
+          loadedConfigObj.GIS_MIN_INPUTS_GENERATED
+      );
+      newConfiguration.minInputsGenerated =
+        loadedConfigObj.GIS_MIN_INPUTS_GENERATED;
+    }
 
-      if (loadedConfigObj.GIS_MAX_INPUTS_GENERATED !== undefined){
-        console.log("GIS | LOADED GIS_MAX_INPUTS_GENERATED: " + loadedConfigObj.GIS_MAX_INPUTS_GENERATED);
-        newConfiguration.maxInputsGenerated = loadedConfigObj.GIS_MAX_INPUTS_GENERATED;
-      }
+    if (loadedConfigObj.GIS_MAX_INPUTS_GENERATED !== undefined) {
+      console.log(
+        "GIS | LOADED GIS_MAX_INPUTS_GENERATED: " +
+          loadedConfigObj.GIS_MAX_INPUTS_GENERATED
+      );
+      newConfiguration.maxInputsGenerated =
+        loadedConfigObj.GIS_MAX_INPUTS_GENERATED;
+    }
 
-      if (loadedConfigObj.GIS_MIN_TOTAL_MIN !== undefined){
-        console.log("GIS | LOADED GIS_MIN_TOTAL_MIN: " + loadedConfigObj.GIS_MIN_TOTAL_MIN);
-        newConfiguration.minTotalMin = loadedConfigObj.GIS_MIN_TOTAL_MIN;
-      }
+    if (loadedConfigObj.GIS_MIN_TOTAL_MIN !== undefined) {
+      console.log(
+        "GIS | LOADED GIS_MIN_TOTAL_MIN: " + loadedConfigObj.GIS_MIN_TOTAL_MIN
+      );
+      newConfiguration.minTotalMin = loadedConfigObj.GIS_MIN_TOTAL_MIN;
+    }
 
-      if (loadedConfigObj.GIS_MIN_TOTAL_MIN_PROFILE_TYPE_HASHMAP !== undefined){
-        console.log("GIS | LOADED GIS_MIN_TOTAL_MIN_PROFILE_TYPE_HASHMAP: " + loadedConfigObj.GIS_MIN_TOTAL_MIN_PROFILE_TYPE_HASHMAP);
-        newConfiguration.minTotalMinProfileHashMap = loadedConfigObj.GIS_MIN_TOTAL_MIN_PROFILE_TYPE_HASHMAP;
-      }
+    if (loadedConfigObj.GIS_MIN_TOTAL_MIN_PROFILE_TYPE_HASHMAP !== undefined) {
+      console.log(
+        "GIS | LOADED GIS_MIN_TOTAL_MIN_PROFILE_TYPE_HASHMAP: " +
+          loadedConfigObj.GIS_MIN_TOTAL_MIN_PROFILE_TYPE_HASHMAP
+      );
+      newConfiguration.minTotalMinProfileHashMap =
+        loadedConfigObj.GIS_MIN_TOTAL_MIN_PROFILE_TYPE_HASHMAP;
+    }
 
-      if (loadedConfigObj.GIS_MIN_TOTAL_MIN_TWEETS_TYPE_HASHMAP !== undefined){
-        console.log("GIS | LOADED GIS_MIN_TOTAL_MIN_TWEETS_TYPE_HASHMAP: " + loadedConfigObj.GIS_MIN_TOTAL_MIN_TWEETS_TYPE_HASHMAP);
-        newConfiguration.minTotalMinTweetsHashMap = loadedConfigObj.GIS_MIN_TOTAL_MIN_TWEETS_TYPE_HASHMAP;
-      }
+    if (loadedConfigObj.GIS_MIN_TOTAL_MIN_TWEETS_TYPE_HASHMAP !== undefined) {
+      console.log(
+        "GIS | LOADED GIS_MIN_TOTAL_MIN_TWEETS_TYPE_HASHMAP: " +
+          loadedConfigObj.GIS_MIN_TOTAL_MIN_TWEETS_TYPE_HASHMAP
+      );
+      newConfiguration.minTotalMinTweetsHashMap =
+        loadedConfigObj.GIS_MIN_TOTAL_MIN_TWEETS_TYPE_HASHMAP;
+    }
 
-      if (loadedConfigObj.GIS_MIN_DOMINANT_MIN !== undefined){
-        console.log("LOADED GIS_MIN_DOMINANT_MIN: " + loadedConfigObj.GIS_MIN_DOMINANT_MIN);
-        newConfiguration.minDominantMin = loadedConfigObj.GIS_MIN_DOMINANT_MIN;
-      }
+    if (loadedConfigObj.GIS_MIN_DOMINANT_MIN !== undefined) {
+      console.log(
+        "LOADED GIS_MIN_DOMINANT_MIN: " + loadedConfigObj.GIS_MIN_DOMINANT_MIN
+      );
+      newConfiguration.minDominantMin = loadedConfigObj.GIS_MIN_DOMINANT_MIN;
+    }
 
-      if (loadedConfigObj.GIS_MAX_DOMINANT_MIN !== undefined){
-        console.log("GIS | LOADED GIS_MAX_DOMINANT_MIN: " + loadedConfigObj.GIS_MAX_DOMINANT_MIN);
-        newConfiguration.maxDominantMin = loadedConfigObj.GIS_MAX_DOMINANT_MIN;
-      }
+    if (loadedConfigObj.GIS_MAX_DOMINANT_MIN !== undefined) {
+      console.log(
+        "GIS | LOADED GIS_MAX_DOMINANT_MIN: " +
+          loadedConfigObj.GIS_MAX_DOMINANT_MIN
+      );
+      newConfiguration.maxDominantMin = loadedConfigObj.GIS_MAX_DOMINANT_MIN;
+    }
 
-      if (loadedConfigObj.GIS_TEST_MODE !== undefined){
-        console.log("GIS | LOADED GIS_TEST_MODE: " + loadedConfigObj.GIS_TEST_MODE);
-        newConfiguration.testMode = loadedConfigObj.GIS_TEST_MODE;
-      }
+    if (loadedConfigObj.GIS_TEST_MODE !== undefined) {
+      console.log(
+        "GIS | LOADED GIS_TEST_MODE: " + loadedConfigObj.GIS_TEST_MODE
+      );
+      newConfiguration.testMode = loadedConfigObj.GIS_TEST_MODE;
+    }
 
-      if (loadedConfigObj.GIS_QUIT_ON_COMPLETE !== undefined){
-        console.log("GIS | LOADED GIS_QUIT_ON_COMPLETE: " + loadedConfigObj.GIS_QUIT_ON_COMPLETE);
-        newConfiguration.quitOnComplete = loadedConfigObj.GIS_QUIT_ON_COMPLETE;
-      }
+    if (loadedConfigObj.GIS_QUIT_ON_COMPLETE !== undefined) {
+      console.log(
+        "GIS | LOADED GIS_QUIT_ON_COMPLETE: " +
+          loadedConfigObj.GIS_QUIT_ON_COMPLETE
+      );
+      newConfiguration.quitOnComplete = loadedConfigObj.GIS_QUIT_ON_COMPLETE;
+    }
 
-      if (loadedConfigObj.GIS_HISTOGRAM_PARSE_DOMINANT_MIN !== undefined){
-        console.log("GIS | LOADED GIS_HISTOGRAM_PARSE_DOMINANT_MIN: " + loadedConfigObj.GIS_HISTOGRAM_PARSE_DOMINANT_MIN);
-        newConfiguration.histogramParseDominantMin = loadedConfigObj.GIS_HISTOGRAM_PARSE_DOMINANT_MIN;
-      }
+    if (loadedConfigObj.GIS_HISTOGRAM_PARSE_DOMINANT_MIN !== undefined) {
+      console.log(
+        "GIS | LOADED GIS_HISTOGRAM_PARSE_DOMINANT_MIN: " +
+          loadedConfigObj.GIS_HISTOGRAM_PARSE_DOMINANT_MIN
+      );
+      newConfiguration.histogramParseDominantMin =
+        loadedConfigObj.GIS_HISTOGRAM_PARSE_DOMINANT_MIN;
+    }
 
-      if (loadedConfigObj.GIS_HISTOGRAM_PARSE_TOTAL_MIN !== undefined){
-        console.log("GIS | LOADED GIS_HISTOGRAM_PARSE_TOTAL_MIN: " + loadedConfigObj.GIS_HISTOGRAM_PARSE_TOTAL_MIN);
-        newConfiguration.histogramParseTotalMin = loadedConfigObj.GIS_HISTOGRAM_PARSE_TOTAL_MIN;
-      }
+    if (loadedConfigObj.GIS_HISTOGRAM_PARSE_TOTAL_MIN !== undefined) {
+      console.log(
+        "GIS | LOADED GIS_HISTOGRAM_PARSE_TOTAL_MIN: " +
+          loadedConfigObj.GIS_HISTOGRAM_PARSE_TOTAL_MIN
+      );
+      newConfiguration.histogramParseTotalMin =
+        loadedConfigObj.GIS_HISTOGRAM_PARSE_TOTAL_MIN;
+    }
 
-      if (loadedConfigObj.GIS_ENABLE_STDIN !== undefined){
-        console.log("GIS | LOADED GIS_ENABLE_STDIN: " + loadedConfigObj.GIS_ENABLE_STDIN);
-        newConfiguration.enableStdin = loadedConfigObj.GIS_ENABLE_STDIN;
-      }
+    if (loadedConfigObj.GIS_ENABLE_STDIN !== undefined) {
+      console.log(
+        "GIS | LOADED GIS_ENABLE_STDIN: " + loadedConfigObj.GIS_ENABLE_STDIN
+      );
+      newConfiguration.enableStdin = loadedConfigObj.GIS_ENABLE_STDIN;
+    }
 
-      if (loadedConfigObj.GIS_KEEPALIVE_INTERVAL !== undefined) {
-        console.log("GIS | LOADED GIS_KEEPALIVE_INTERVAL: " + loadedConfigObj.GIS_KEEPALIVE_INTERVAL);
-        newConfiguration.keepaliveInterval = loadedConfigObj.GIS_KEEPALIVE_INTERVAL;
-      }
+    if (loadedConfigObj.GIS_KEEPALIVE_INTERVAL !== undefined) {
+      console.log(
+        "GIS | LOADED GIS_KEEPALIVE_INTERVAL: " +
+          loadedConfigObj.GIS_KEEPALIVE_INTERVAL
+      );
+      newConfiguration.keepaliveInterval =
+        loadedConfigObj.GIS_KEEPALIVE_INTERVAL;
+    }
 
     return newConfiguration;
-  }
-  catch(err){
-    console.error(chalkError(MODULE_ID_PREFIX + " | ERROR LOAD CONFIG: " + fullPath
-      + "\n" + jsonPrint(err)
-    ));
+  } catch (err) {
+    console.error(
+      chalkError(
+        MODULE_ID_PREFIX +
+          " | ERROR LOAD CONFIG: " +
+          fullPath +
+          "\n" +
+          jsonPrint(err)
+      )
+    );
     throw err;
   }
 }
 
-async function loadAllConfigFiles(){
-
+async function loadAllConfigFiles() {
   statsObj.status = "LOAD CONFIG";
 
-  const defaultConfig = await loadConfigFile({folder: configDefaultFolder, file: configDefaultFile});
+  const defaultConfig = await loadConfigFile({
+    folder: configDefaultFolder,
+    file: configDefaultFile,
+  });
 
   if (defaultConfig) {
     defaultConfiguration = defaultConfig;
-    console.log(chalkInfo(MODULE_ID_PREFIX + " | <<< LOADED DEFAULT CONFIG " + configDefaultFolder + "/" + configDefaultFile));
+    console.log(
+      chalkInfo(
+        MODULE_ID_PREFIX +
+          " | <<< LOADED DEFAULT CONFIG " +
+          configDefaultFolder +
+          "/" +
+          configDefaultFile
+      )
+    );
   }
-  
-  const hostConfig = await loadConfigFile({folder: configHostFolder, file: configHostFile, noErrorNotFound: true});
+
+  const hostConfig = await loadConfigFile({
+    folder: configHostFolder,
+    file: configHostFile,
+    noErrorNotFound: true,
+  });
 
   if (hostConfig) {
     hostConfiguration = hostConfig;
-    console.log(chalkInfo(MODULE_ID_PREFIX + " | <<< LOADED HOST CONFIG " + configHostFolder + "/" + configHostFile));
+    console.log(
+      chalkInfo(
+        MODULE_ID_PREFIX +
+          " | <<< LOADED HOST CONFIG " +
+          configHostFolder +
+          "/" +
+          configHostFile
+      )
+    );
   }
 
-  await loadInputs({folder: configDefaultFolder, file: defaultInputsConfigFile, noErrorNotFound: false});
-  
+  await loadInputs({
+    folder: configDefaultFolder,
+    file: defaultInputsConfigFile,
+    noErrorNotFound: false,
+  });
+
   const defaultAndHostConfig = merge(defaultConfiguration, hostConfiguration); // host settings override defaults
   const tempConfig = merge(configuration, defaultAndHostConfig); // any new settings override existing config
 
@@ -1038,74 +1290,101 @@ async function loadAllConfigFiles(){
 }
 
 async function initConfig(cnf) {
-
   statsObj.status = "INIT CONFIG";
 
   console.log(chalkBlue(MODULE_ID_PREFIX + " | INIT CONFIG"));
 
   if (debug.enabled) {
-    console.log("\nGIS | %%%%%%%%%%%%%%\nGIS |  DEBUG ENABLED \nGIS | %%%%%%%%%%%%%%\n");
+    console.log(
+      "\nGIS | %%%%%%%%%%%%%%\nGIS |  DEBUG ENABLED \nGIS | %%%%%%%%%%%%%%\n"
+    );
   }
 
   cnf.processName = process.env.PROCESS_NAME || MODULE_ID;
-  cnf.testMode = (process.env.TEST_MODE === "true") ? true : cnf.testMode;
+  cnf.testMode = process.env.TEST_MODE === "true" ? true : cnf.testMode;
   cnf.quitOnError = process.env.QUIT_ON_ERROR || false;
   cnf.enableStdin = process.env.ENABLE_STDIN || true;
 
-  if (process.env.QUIT_ON_COMPLETE === "false") { cnf.quitOnComplete = false; }
-  else if ((process.env.QUIT_ON_COMPLETE === true) || (process.env.QUIT_ON_COMPLETE === "true")) {
+  if (process.env.QUIT_ON_COMPLETE === "false") {
+    cnf.quitOnComplete = false;
+  } else if (
+    process.env.QUIT_ON_COMPLETE === true ||
+    process.env.QUIT_ON_COMPLETE === "true"
+  ) {
     cnf.quitOnComplete = true;
   }
 
   try {
-
     await loadAllConfigFiles();
     await loadCommandLineArgs();
 
     const configArgs = Object.keys(configuration);
 
-    configArgs.forEach(function(arg){
+    configArgs.forEach(function (arg) {
       if (_.isObject(configuration[arg])) {
-        console.log(MODULE_ID_PREFIX + " | _FINAL CONFIG | " + arg + "\n" + jsonPrint(configuration[arg]));
-      }
-      else {
-        console.log(MODULE_ID_PREFIX + " | _FINAL CONFIG | " + arg + ": " + configuration[arg]);
+        console.log(
+          MODULE_ID_PREFIX +
+            " | _FINAL CONFIG | " +
+            arg +
+            "\n" +
+            jsonPrint(configuration[arg])
+        );
+      } else {
+        console.log(
+          MODULE_ID_PREFIX +
+            " | _FINAL CONFIG | " +
+            arg +
+            ": " +
+            configuration[arg]
+        );
       }
     });
-    
+
     statsObj.commandLineArgsLoaded = true;
 
-    if (configuration.enableStdin) { initStdIn(); }
+    if (configuration.enableStdin) {
+      initStdIn();
+    }
 
     await initStatsUpdate();
 
     return configuration;
-
-  }
-  catch(err){
-    console.log(chalkError(MODULE_ID_PREFIX + " | *** CONFIG LOAD ERROR: " + err ));
+  } catch (err) {
+    console.log(
+      chalkError(MODULE_ID_PREFIX + " | *** CONFIG LOAD ERROR: " + err)
+    );
     throw err;
   }
 }
 
-function loadStream(params){
-
-  return new Promise(function(resolve, reject){
-
+function loadStream(params) {
+  return new Promise(function (resolve, reject) {
     const streamPath = path.join(params.folder, params.file);
-    const userProfileOnlyFlag = params.userProfileOnlyFlag || configuration.userProfileOnlyFlag;
+    const userProfileOnlyFlag =
+      params.userProfileOnlyFlag || configuration.userProfileOnlyFlag;
     const minTotalMin = params.minTotalMin || configuration.minTotalMin;
 
-    console.log(chalkInfo("GIS | LOAD STREAM"
-      + " | USER PROFILE ONLY: " + userProfileOnlyFlag
-      + " | MIN TOT MIN: " + minTotalMin
-      + " | PATH: " + streamPath
-    ));
+    console.log(
+      chalkInfo(
+        "GIS | LOAD STREAM" +
+          " | USER PROFILE ONLY: " +
+          userProfileOnlyFlag +
+          " | MIN TOT MIN: " +
+          minTotalMin +
+          " | PATH: " +
+          streamPath
+      )
+    );
 
     const pathExists = fs.existsSync(streamPath);
 
     if (!pathExists) {
-      console.log(chalkAlert("GIS | !!! STREAM PATH DOES NOT EXIST ... SKIPPING LOAD: " + streamPath));
+      console.log(
+        chalkAlert(
+          "GIS | !!! STREAM PATH DOES NOT EXIST ... SKIPPING LOAD: " +
+            streamPath
+        )
+      );
       return resolve();
       // return reject(new Error("PATH DOES NOT EXIST: " + streamPath));
     }
@@ -1119,7 +1398,9 @@ function loadStream(params){
     let totalCategorized = 0;
     let maxTotalCategorized = 0;
 
-    const pipeline = fs.createReadStream(streamPath).pipe(JSONStream.parse("histograms.$*.$*"));
+    const pipeline = fs
+      .createReadStream(streamPath)
+      .pipe(JSONStream.parse("histograms.$*.$*"));
 
     // let pipeline;
     // if (userProfileOnlyFlag){
@@ -1129,8 +1410,7 @@ function loadStream(params){
     //   pipeline = fs.createReadStream(streamPath).pipe(JSONStream.parse("histograms.$*.$*"));
     // }
 
-    pipeline.on("data", function(obj){
-
+    pipeline.on("data", function (obj) {
       totalInputs += 1;
 
       // VALUE
@@ -1143,111 +1423,156 @@ function loadStream(params){
       // ├─ none: 0
       // └─ uncategorized: 11
 
-
       // totalCategorized = obj.value.total - obj.value.uncategorized;
       totalCategorized = obj.value.total;
 
       maxTotalCategorized = Math.max(maxTotalCategorized, totalCategorized);
 
       if (totalCategorized >= minTotalMin) {
-
         moreThanMin += 1;
 
-        debug(chalkLog("GIS | +++ INPUT | PROFILE ONLY: " + userProfileOnlyFlag
-          + " [" + moreThanMin + "]"
-          + " | " + params.type
-          + " | " + obj.key
-          + " | TOT CAT: " + totalCategorized 
-          + " | MAX TOT CAT: " + maxTotalCategorized 
-          // + "\nVALUE\n" + jsonPrint(obj.value)
-        ));
+        debug(
+          chalkLog(
+            "GIS | +++ INPUT | PROFILE ONLY: " +
+              userProfileOnlyFlag +
+              " [" +
+              moreThanMin +
+              "]" +
+              " | " +
+              params.type +
+              " | " +
+              obj.key +
+              " | TOT CAT: " +
+              totalCategorized +
+              " | MAX TOT CAT: " +
+              maxTotalCategorized
+            // + "\nVALUE\n" + jsonPrint(obj.value)
+          )
+        );
 
         fileObj[obj.key] = obj.value;
-      }
-      else {
+      } else {
         lessThanMin += 1;
       }
 
       debug("data: " + jsonPrint(obj));
 
       if (totalInputs % 50000 === 0) {
-        console.log(chalkLog("GIS | STREAM INPUTS | " + streamPath + " | INPUTS: " + totalInputs));
+        console.log(
+          chalkLog(
+            "GIS | STREAM INPUTS | " + streamPath + " | INPUTS: " + totalInputs
+          )
+        );
       }
 
-      if (configuration.testMode && (totalInputs >= MAX_TEST_INPUTS) && (totalInputs % 100 === 0)) {
-        console.log(chalkAlert("GIS | TEST MODE | END READ | TOTAL TEST INPUTS: " + totalInputs + " MAX: " + MAX_TEST_INPUTS));
+      if (
+        configuration.testMode &&
+        totalInputs >= MAX_TEST_INPUTS &&
+        totalInputs % 100 === 0
+      ) {
+        console.log(
+          chalkAlert(
+            "GIS | TEST MODE | END READ | TOTAL TEST INPUTS: " +
+              totalInputs +
+              " MAX: " +
+              MAX_TEST_INPUTS
+          )
+        );
         pipeline.destroy();
-        return resolve({ 
-          obj: fileObj, 
-          maxTotalCategorized: maxTotalCategorized, 
-          totalInputs: totalInputs, 
-          lessThanMin: lessThanMin, 
-          moreThanMin: moreThanMin
+        return resolve({
+          obj: fileObj,
+          maxTotalCategorized: maxTotalCategorized,
+          totalInputs: totalInputs,
+          lessThanMin: lessThanMin,
+          moreThanMin: moreThanMin,
         });
       }
     });
 
-    pipeline.on("header", function(){
+    pipeline.on("header", function () {
       debug("GIS | HEADER");
     });
 
-    pipeline.on("footer", function(){
+    pipeline.on("footer", function () {
       console.log("GIS | FOOTER");
     });
 
-    pipeline.on("close", function(){
-      if (configuration.verbose) { console.log(chalkInfo("GIS | STREAM CLOSED | INPUTS: " + totalInputs + " | " + streamPath)); }
-      // return resolve({ 
-      //   obj: fileObj, 
-      //   maxTotalCategorized: maxTotalCategorized, 
-      //   totalInputs: totalInputs, 
-      //   lessThanMin: lessThanMin, 
+    pipeline.on("close", function () {
+      if (configuration.verbose) {
+        console.log(
+          chalkInfo(
+            "GIS | STREAM CLOSED | INPUTS: " + totalInputs + " | " + streamPath
+          )
+        );
+      }
+      // return resolve({
+      //   obj: fileObj,
+      //   maxTotalCategorized: maxTotalCategorized,
+      //   totalInputs: totalInputs,
+      //   lessThanMin: lessThanMin,
       //   moreThanMin: moreThanMin
       // });
     });
 
-    pipeline.on("end", function(){
-      if (configuration.verbose) { console.log(chalkInfo("GIS | STREAM END | INPUTS: " + totalInputs + " | " + streamPath)); }
-      return resolve({ 
-        obj: fileObj, 
-        maxTotalCategorized: maxTotalCategorized, 
-        totalInputs: totalInputs, 
-        lessThanMin: lessThanMin, 
-        moreThanMin: moreThanMin
+    pipeline.on("end", function () {
+      if (configuration.verbose) {
+        console.log(
+          chalkInfo(
+            "GIS | STREAM END | INPUTS: " + totalInputs + " | " + streamPath
+          )
+        );
+      }
+      return resolve({
+        obj: fileObj,
+        maxTotalCategorized: maxTotalCategorized,
+        totalInputs: totalInputs,
+        lessThanMin: lessThanMin,
+        moreThanMin: moreThanMin,
       });
     });
 
-    pipeline.on("finish", function(){
-      if (configuration.verbose) { console.log(chalkInfo("GIS | STREAM FINISH | INPUTS: " + totalInputs + " | " + streamPath)); }
-      // return resolve({ 
-      //   obj: fileObj, 
-      //   maxTotalCategorized: maxTotalCategorized, 
-      //   totalInputs: totalInputs, 
-      //   lessThanMin: lessThanMin, 
+    pipeline.on("finish", function () {
+      if (configuration.verbose) {
+        console.log(
+          chalkInfo(
+            "GIS | STREAM FINISH | INPUTS: " + totalInputs + " | " + streamPath
+          )
+        );
+      }
+      // return resolve({
+      //   obj: fileObj,
+      //   maxTotalCategorized: maxTotalCategorized,
+      //   totalInputs: totalInputs,
+      //   lessThanMin: lessThanMin,
       //   moreThanMin: moreThanMin
       // });
     });
 
-    pipeline.on("error", function(err){
-      console.log(chalkError("GIS | STREAM ERROR | INPUTS: " + totalInputs + " | " + streamPath));
+    pipeline.on("error", function (err) {
+      console.log(
+        chalkError(
+          "GIS | STREAM ERROR | INPUTS: " + totalInputs + " | " + streamPath
+        )
+      );
       console.log(chalkError("GIS | *** LOAD FILE ERROR: " + err));
       return reject(err);
     });
-
   });
 }
 
-function runUserProfileCharCodes(){
-
-  return new Promise(function(resolve, reject){
-
+function runUserProfileCharCodes() {
+  return new Promise(function (resolve, reject) {
     statsObj.status = "RUN USER PROFILE CHAR CODES";
 
-    console.log(chalkInfo(
-        "\n--------------------------------------------------------"
-      + "\n" + MODULE_ID_PREFIX + " | USER PROFILE CHAR CODES ONLY"
-      + "\n--------------------------------------------------------"
-    ));
+    console.log(
+      chalkInfo(
+        "\n--------------------------------------------------------" +
+          "\n" +
+          MODULE_ID_PREFIX +
+          " | USER PROFILE CHAR CODES ONLY" +
+          "\n--------------------------------------------------------"
+      )
+    );
 
     globalInputsObj.meta = {};
     globalInputsObj.meta.type = {};
@@ -1260,26 +1585,32 @@ function runUserProfileCharCodes(){
     globalInputsObj.meta.userProfileCharCounts.name = TWITTER_USER_NAME_CHARS;
     globalInputsObj.meta.userProfileCharCounts.screenName = TWITTER_USER_SCREENNAME_CHARS;
 
-    globalInputsObj.meta.numInputs = TWITTER_USER_DESCRIPTION_CHARS+TWITTER_USER_LOCATION_CHARS+TWITTER_USER_NAME_CHARS+TWITTER_USER_SCREENNAME_CHARS;
+    globalInputsObj.meta.numInputs =
+      TWITTER_USER_DESCRIPTION_CHARS +
+      TWITTER_USER_LOCATION_CHARS +
+      TWITTER_USER_NAME_CHARS +
+      TWITTER_USER_SCREENNAME_CHARS;
 
-    // globalInputsObj.inputsId = configuration.inputsFilePrefix 
-    //   + "_" + moment().format(compactDateTimeFormat) 
-    //   + "_" + globalInputsObj.meta.numInputs 
+    // globalInputsObj.inputsId = configuration.inputsFilePrefix
+    //   + "_" + moment().format(compactDateTimeFormat)
+    //   + "_" + globalInputsObj.meta.numInputs
     //   + "_profilecharcodes"
-    //   + "_" + hostname 
+    //   + "_" + hostname
     //   + "_" + process.pid;
 
-    globalInputsObj.inputsId = configuration.inputsFilePrefix 
-      + "_25250101_000000_" 
-      + globalInputsObj.meta.numInputs 
-      + "_profilecharcodes";
+    globalInputsObj.inputsId =
+      configuration.inputsFilePrefix +
+      "_25250101_000000_" +
+      globalInputsObj.meta.numInputs +
+      "_profilecharcodes";
 
-    const userProfileProperties = Object.keys(globalInputsObj.meta.userProfileCharCounts).sort();
+    const userProfileProperties = Object.keys(
+      globalInputsObj.meta.userProfileCharCounts
+    ).sort();
 
     globalInputsObj.inputs = {};
 
-    for (const userProfileProperty of userProfileProperties){
-
+    for (const userProfileProperty of userProfileProperties) {
       // console.log(chalkInfo(MODULE_ID_PREFIX
       //   + " | " + userProfileProperty.toUpperCase()
       //   + " | " + globalInputsObj.meta.userProfileCharCounts[userProfileProperty]
@@ -1288,322 +1619,462 @@ function runUserProfileCharCodes(){
       globalInputsObj.meta.type[userProfileProperty] = {};
 
       // start with zero inputs of type if more than configuration.minNumInputsPerType
-      globalInputsObj.meta.type[userProfileProperty].numInputs = globalInputsObj.meta.userProfileCharCounts[userProfileProperty];
+      globalInputsObj.meta.type[userProfileProperty].numInputs =
+        globalInputsObj.meta.userProfileCharCounts[userProfileProperty];
 
       globalInputsObj.inputs[userProfileProperty] = [];
 
-      for (let index = 0; index < globalInputsObj.meta.userProfileCharCounts[userProfileProperty]; index++){
-        globalInputsObj.inputs[userProfileProperty].push(userProfileProperty + "_" + index.toString().padStart(3,"0"));
+      for (
+        let index = 0;
+        index < globalInputsObj.meta.userProfileCharCounts[userProfileProperty];
+        index++
+      ) {
+        globalInputsObj.inputs[userProfileProperty].push(
+          userProfileProperty + "_" + index.toString().padStart(3, "0")
+        );
       }
-
     }
 
-    const networkInputsDoc = new global.wordAssoDb.NetworkInputs(globalInputsObj);
+    const networkInputsDoc = new global.wordAssoDb.NetworkInputs(
+      globalInputsObj
+    );
 
-    networkInputsDoc.save(async function(err, savedNetworkInputsDoc){
-
+    networkInputsDoc.save(async function (err, savedNetworkInputsDoc) {
       if (err) {
-        console.log(chalkError("GIS | *** CREATE NETWORK INPUTS DB DOCUMENT: " + err));
+        console.log(
+          chalkError("GIS | *** CREATE NETWORK INPUTS DB DOCUMENT: " + err)
+        );
         return reject(err);
       }
 
-      printInputsObj("GIS | +++ SAVED NETWORK INPUTS DB DOCUMENT", savedNetworkInputsDoc);
+      printInputsObj(
+        "GIS | +++ SAVED NETWORK INPUTS DB DOCUMENT",
+        savedNetworkInputsDoc
+      );
 
-      console.log(chalk.blue(
-          "\nGIS | ========================================================================================="
-        + "\nGIS | INPUTS | USER PROFILE CHAR CODES ONLY: " + configuration.generateUserProfileCharsCodesOnlyInputs 
-        + "\nGIS | -----------------------------------------------------------------------------------------\n"
-        + jsonPrint(globalInputsObj.meta)
-        + "\nGIS | =========================================================================================\n"
-      ));
+      console.log(
+        chalk.blue(
+          "\nGIS | =========================================================================================" +
+            "\nGIS | INPUTS | USER PROFILE CHAR CODES ONLY: " +
+            configuration.generateUserProfileCharsCodesOnlyInputs +
+            "\nGIS | -----------------------------------------------------------------------------------------\n" +
+            jsonPrint(globalInputsObj.meta) +
+            "\nGIS | =========================================================================================\n"
+        )
+      );
 
       const inFile = globalInputsObj.inputsId + ".json";
 
-      if (configuration.testMode) { 
+      if (configuration.testMode) {
         inFolder += "_test";
       }
 
-      console.log(chalkInfo("GIS | ... SAVING INPUTS FILE: " + inFolder + "/" + inFile));
+      console.log(
+        chalkInfo("GIS | ... SAVING INPUTS FILE: " + inFolder + "/" + inFile)
+      );
 
-      await tcUtils.saveFile({folder: inFolder, file: inFile, obj: globalInputsObj});
+      await tcUtils.saveFile({
+        folder: inFolder,
+        file: inFile,
+        obj: globalInputsObj,
+      });
 
-      console.log(chalkInfo("GIS | ... UPDATING INPUTS CONFIG FILE: " + configDefaultFolder + "/" + defaultInputsConfigFile));
+      console.log(
+        chalkInfo(
+          "GIS | ... UPDATING INPUTS CONFIG FILE: " +
+            configDefaultFolder +
+            "/" +
+            defaultInputsConfigFile
+        )
+      );
 
-      const networkInputsConfigObj = await tcUtils.loadFile({folder: configDefaultFolder, file: defaultInputsConfigFile, noErrorNotFound: true });
+      const networkInputsConfigObj = await tcUtils.loadFile({
+        folder: configDefaultFolder,
+        file: defaultInputsConfigFile,
+        noErrorNotFound: true,
+      });
 
       networkInputsConfigObj.INPUTS_IDS.push(globalInputsObj.inputsId);
-      networkInputsConfigObj.INPUTS_IDS = _.uniq(networkInputsConfigObj.INPUTS_IDS);
+      networkInputsConfigObj.INPUTS_IDS = _.uniq(
+        networkInputsConfigObj.INPUTS_IDS
+      );
 
-      await tcUtils.saveFile({folder: configDefaultFolder, file: defaultInputsConfigFile, obj: networkInputsConfigObj});
+      await tcUtils.saveFile({
+        folder: configDefaultFolder,
+        file: defaultInputsConfigFile,
+        obj: networkInputsConfigObj,
+      });
 
       let slackText = "\n*GIS | INPUTS*";
       slackText = slackText + "\n" + globalInputsObj.inputsId;
 
-      await slackSendWebMessage({channel: slackChannel, text: slackText});
+      await slackSendWebMessage({ channel: slackChannel, text: slackText });
 
       resolve();
-
     });
-
   });
 }
 
-function runMain(){
-
-  return new Promise(function(resolve, reject){
-
+function runMain() {
+  return new Promise(function (resolve, reject) {
     statsObj.status = "RUN MAIN";
 
-    console.log(chalkInfo(
-        "\n--------------------------------------------------------"
-      + "\n" + MODULE_ID_PREFIX + " | USER PROFILE HISTOGRAM ONLY: " + configuration.userProfileOnlyFlag
-      + "\n--------------------------------------------------------"
-    ));
+    console.log(
+      chalkInfo(
+        "\n--------------------------------------------------------" +
+          "\n" +
+          MODULE_ID_PREFIX +
+          " | USER PROFILE HISTOGRAM ONLY: " +
+          configuration.userProfileOnlyFlag +
+          "\n--------------------------------------------------------"
+      )
+    );
 
-    console.log(chalkInfo(
-        "\n--------------------------------------------------------"
-      + "\n" + MODULE_ID_PREFIX + " | USER DESCRIPTION ONLY: " + configuration.userDescriptionOnlyFlag
-      + "\n--------------------------------------------------------"
-    ));
+    console.log(
+      chalkInfo(
+        "\n--------------------------------------------------------" +
+          "\n" +
+          MODULE_ID_PREFIX +
+          " | USER DESCRIPTION ONLY: " +
+          configuration.userDescriptionOnlyFlag +
+          "\n--------------------------------------------------------"
+      )
+    );
 
     const genInParams = {};
 
     genInParams.minTotalMin = {};
-    genInParams.minTotalMin = configuration.userProfileOnlyFlag ? configuration.minTotalMinProfileHashMap : configuration.minTotalMinTweetsHashMap;
+    genInParams.minTotalMin = configuration.userProfileOnlyFlag
+      ? configuration.minTotalMinProfileHashMap
+      : configuration.minTotalMinTweetsHashMap;
 
     genInParams.minDominantMin = {};
 
     let randomSeed = 1;
 
     DEFAULT_TWEETS_INPUT_TYPES.forEach((inputType) => {
+      randomSeed = configuration.randomSeedFlag ? random.float(0.9, 1.1) : 1;
+      genInParams.minDominantMin[inputType] =
+        configuration.minDominantMin * randomSeed;
 
-      randomSeed = configuration.randomSeedFlag ? random.float(0.9,1.1) : 1;
-      genInParams.minDominantMin[inputType] = configuration.minDominantMin * randomSeed;
-
-      console.log(chalkLog(MODULE_ID_PREFIX
-        + " | RANDOM SEED: " + randomSeed.toFixed(3)
-        + " | MIN DOM MIN: " + genInParams.minDominantMin[inputType].toFixed(3)
-        + " | INPUT TYPE: " + inputType.toUpperCase()
-      ))
+      console.log(
+        chalkLog(
+          MODULE_ID_PREFIX +
+            " | RANDOM SEED: " +
+            randomSeed.toFixed(3) +
+            " | MIN DOM MIN: " +
+            genInParams.minDominantMin[inputType].toFixed(3) +
+            " | INPUT TYPE: " +
+            inputType.toUpperCase()
+        )
+      );
     });
 
     genInParams.histogramsObj = {};
     genInParams.histogramsObj.histograms = {};
-    genInParams.histogramsObj.histogramParseDominantMin = configuration.histogramParseDominantMin;
-    genInParams.histogramsObj.histogramParseTotalMin = configuration.histogramParseTotalMin;
+    genInParams.histogramsObj.histogramParseDominantMin =
+      configuration.histogramParseDominantMin;
+    genInParams.histogramsObj.histogramParseTotalMin =
+      configuration.histogramParseTotalMin;
 
-    const histogramType = (configuration.userProfileOnlyFlag) ? "profile" : "tweets";
-    const inputTypes = (configuration.userProfileOnlyFlag) ? USER_PROFILE_INPUT_TYPES : DEFAULT_TWEETS_INPUT_TYPES;
+    const histogramType = configuration.userProfileOnlyFlag
+      ? "profile"
+      : "tweets";
+    const inputTypes = configuration.userProfileOnlyFlag
+      ? USER_PROFILE_INPUT_TYPES
+      : DEFAULT_TWEETS_INPUT_TYPES;
 
-    inputTypes.forEach(function(type){
+    inputTypes.forEach(function (type) {
       statsObj.histograms[type] = {};
       histograms[type] = {};
     });
 
-    async.eachSeries(inputTypes, function(type, cb){
+    async.eachSeries(
+      inputTypes,
+      function (type, cb) {
+        if (type === "sentiment") {
+          // │  │  ├─ numInputs: 9
+          // │  │  ├─ underMinNumInputs
+          // │  │  ├─ overMaxNumInputs
+          // │  │  ├─ currentMaxNumInputs: 0
+          // │  │  ├─ totalInputs: 26
+          // │  │  ├─ minDominantMin: 0.7125
+          // │  │  ├─ minTotalMin: 10
+          // │  │  ├─ lessThanMin: 0
+          // │  │  ├─ moreThanMin: 26
+          // │  │  └─ totalMin: 0
 
-      if (type === "sentiment"){
+          globalInputsObj.inputs[type] = ["comp", "magnitude", "score"];
+          // globalInputsObj.inputs[type] = inputsObj.inputs[type];
+          globalInputsObj.meta.type[type] = {};
+          // globalInputsObj.meta.type[type] = inputsObj.meta.type[type];
+          globalInputsObj.meta.type[type].numInputs = 3;
+          globalInputsObj.meta.type[type].underMinNumInputs = 0;
+          globalInputsObj.meta.type[type].overMaxNumInputs = 0;
+          globalInputsObj.meta.type[type].currentMaxNumInputs = 0;
+          globalInputsObj.meta.type[type].totalInputs = 3;
+          globalInputsObj.meta.type[type].minDominantMin =
+            genInParams.minDominantMin[type];
+          globalInputsObj.meta.type[type].minTotalMin = 1;
+          globalInputsObj.meta.type[type].lessThanMin = 0;
+          globalInputsObj.meta.type[type].moreThanMin = 3;
+          globalInputsObj.meta.type[type].totalMin = 1;
+          cb();
+        } else {
+          histogramsRootFolder = configuration.testMode
+            ? testHistogramsFolder
+            : defaultHistogramsFolder;
 
-        // │  │  ├─ numInputs: 9
-        // │  │  ├─ underMinNumInputs
-        // │  │  ├─ overMaxNumInputs
-        // │  │  ├─ currentMaxNumInputs: 0
-        // │  │  ├─ totalInputs: 26
-        // │  │  ├─ minDominantMin: 0.7125
-        // │  │  ├─ minTotalMin: 10
-        // │  │  ├─ lessThanMin: 0
-        // │  │  ├─ moreThanMin: 26
-        // │  │  └─ totalMin: 0
+          const folder = histogramsRootFolder + "/types/" + type;
+          const file = "histograms_" + type + "_" + histogramType + ".json";
 
-        globalInputsObj.inputs[type] = ["comp", "magnitude", "score"];
-        // globalInputsObj.inputs[type] = inputsObj.inputs[type];
-        globalInputsObj.meta.type[type] = {};
-        // globalInputsObj.meta.type[type] = inputsObj.meta.type[type];
-        globalInputsObj.meta.type[type].numInputs = 3;
-        globalInputsObj.meta.type[type].underMinNumInputs = 0;
-        globalInputsObj.meta.type[type].overMaxNumInputs = 0;
-        globalInputsObj.meta.type[type].currentMaxNumInputs = 0;
-        globalInputsObj.meta.type[type].totalInputs = 3;
-        globalInputsObj.meta.type[type].minDominantMin = genInParams.minDominantMin[type];
-        globalInputsObj.meta.type[type].minTotalMin = 1;
-        globalInputsObj.meta.type[type].lessThanMin = 0;
-        globalInputsObj.meta.type[type].moreThanMin = 3;
-        globalInputsObj.meta.type[type].totalMin = 1;
-        cb();
-      }
-      else{
+          const minTotalMin =
+            genInParams.minTotalMin[type] &&
+            genInParams.minTotalMin[type] !== undefined
+              ? genInParams.minTotalMin[type]
+              : configuration.minTotalMin[type];
 
-        histogramsRootFolder = (configuration.testMode) ? testHistogramsFolder : defaultHistogramsFolder;
+          loadStream({ folder: folder, file: file, minTotalMin: minTotalMin })
+            .then(function (results) {
+              if (!results) {
+                return cb();
+              }
 
-        const folder = histogramsRootFolder + "/types/" + type;
-        const file = "histograms_" + type + "_" + histogramType + ".json";
+              console.log(
+                chalkGreen(
+                  "GIS | +++ LOADED HISTOGRAM" +
+                    " | " +
+                    histogramType.toUpperCase() +
+                    " | " +
+                    type.toUpperCase() +
+                    "\nGIS | TOTAL ITEMS:          " +
+                    results.totalInputs +
+                    "\nGIS | MAX TOT CAT:          " +
+                    results.maxTotalCategorized +
+                    "\nGIS | MIN TOTAL MIN:        " +
+                    minTotalMin +
+                    "\nGIS | MORE THAN TOTAL MIN:  " +
+                    results.moreThanMin +
+                    " (" +
+                    ((100 * results.moreThanMin) / results.totalInputs).toFixed(
+                      2
+                    ) +
+                    "%)" +
+                    "\nGIS | LESS THAN TOTAL MIN:  " +
+                    results.lessThanMin +
+                    " (" +
+                    ((100 * results.lessThanMin) / results.totalInputs).toFixed(
+                      2
+                    ) +
+                    "%)"
+                )
+              );
 
-        const minTotalMin = (genInParams.minTotalMin[type] && (genInParams.minTotalMin[type] !== undefined)) 
-          ? genInParams.minTotalMin[type] 
-          : configuration.minTotalMin[type];
+              genInParams.histogramsObj.histograms[type] = {};
+              genInParams.histogramsObj.histograms[type] = results.obj;
 
-        loadStream({folder: folder, file: file, minTotalMin: minTotalMin})
-        .then(function(results){
+              genInParams.type = type;
+              genInParams.histogram = results.obj;
 
-          if (!results) {
-            return cb();
-          }
-
-          console.log(chalkGreen("GIS | +++ LOADED HISTOGRAM"
-            + " | " + histogramType.toUpperCase()
-            + " | " + type.toUpperCase()
-            + "\nGIS | TOTAL ITEMS:          " + results.totalInputs
-            + "\nGIS | MAX TOT CAT:          " + results.maxTotalCategorized
-            + "\nGIS | MIN TOTAL MIN:        " + minTotalMin
-            + "\nGIS | MORE THAN TOTAL MIN:  " + results.moreThanMin 
-            + " (" + (100*results.moreThanMin/results.totalInputs).toFixed(2) + "%)"
-            + "\nGIS | LESS THAN TOTAL MIN:  " + results.lessThanMin 
-            + " (" + (100*results.lessThanMin/results.totalInputs).toFixed(2) + "%)"
-          ));
-
-          genInParams.histogramsObj.histograms[type] = {};
-          genInParams.histogramsObj.histograms[type] = results.obj;
-
-          genInParams.type = type;
-          genInParams.histogram = results.obj;
-
-          generateInputSets(genInParams)
-          .then(function(inputsObj){
-            globalInputsObj.inputs[type] = {};
-            globalInputsObj.inputs[type] = inputsObj.inputs[type];
-            globalInputsObj.meta.type[type] = {};
-            globalInputsObj.meta.type[type] = inputsObj.meta.type[type];
-            globalInputsObj.meta.type[type].totalInputs = results.totalInputs;
-            globalInputsObj.meta.type[type].minDominantMin = genInParams.minDominantMin[type];
-            globalInputsObj.meta.type[type].minTotalMin = minTotalMin;
-            globalInputsObj.meta.type[type].lessThanMin = results.lessThanMin;
-            globalInputsObj.meta.type[type].moreThanMin = results.moreThanMin;
-            globalInputsObj.meta.type[type].totalMin = globalInputsObj.meta.type[type].totalMin || 0;
-            cb();
-          })
-          .catch(function(err){
-            return cb(err);
-          })
-        })
-        .catch(function(err){
-          console.log(chalkError("GIS | LOAD HISTOGRAMS / GENERATE INPUT SETS ERROR: " + err));
-          cb(err);
-        });
-      }
-
-    }, function(err){
-
-      if (err) {
-        return reject(err);
-      }
-
-      const tableArray = [];
-
-      tableArray.push([
-        "GIS |",
-        "TYPE",
-        "DOM MIN",
-        "TOT IN",
-        "TOT MIN",
-        "IN",
-        "GTOT IN"
-      ]);
-
-      globalInputsObj.meta.userProfileOnlyFlag = configuration.userProfileOnlyFlag || false;
-      globalInputsObj.meta.numInputs = 0;
-
-      async.eachSeries(inputTypes, function(type, cb){
-
-        if (globalInputsObj.meta.type[type] === undefined) { return cb(); }
-
-        globalInputsObj.meta.numInputs += globalInputsObj.meta.type[type].numInputs;
-
-        globalInputsObj.meta.type[type].minDominantMin = globalInputsObj.meta.type[type].minDominantMin || 0;
-        globalInputsObj.meta.type[type].minTotalMin = globalInputsObj.meta.type[type].minTotalMin || 0;
-
-        tableArray.push([
-          "GIS |",
-          type.toUpperCase(),
-          globalInputsObj.meta.type[type].minDominantMin.toFixed(8),
-          globalInputsObj.meta.type[type].totalInputs,
-          globalInputsObj.meta.type[type].minTotalMin,
-          globalInputsObj.meta.type[type].numInputs,
-          globalInputsObj.meta.numInputs
-        ]);
-
-        cb();
-
-      }, function(err){
-
+              generateInputSets(genInParams)
+                .then(function (inputsObj) {
+                  globalInputsObj.inputs[type] = {};
+                  globalInputsObj.inputs[type] = inputsObj.inputs[type];
+                  globalInputsObj.meta.type[type] = {};
+                  globalInputsObj.meta.type[type] = inputsObj.meta.type[type];
+                  globalInputsObj.meta.type[type].totalInputs =
+                    results.totalInputs;
+                  globalInputsObj.meta.type[type].minDominantMin =
+                    genInParams.minDominantMin[type];
+                  globalInputsObj.meta.type[type].minTotalMin = minTotalMin;
+                  globalInputsObj.meta.type[type].lessThanMin =
+                    results.lessThanMin;
+                  globalInputsObj.meta.type[type].moreThanMin =
+                    results.moreThanMin;
+                  globalInputsObj.meta.type[type].totalMin =
+                    globalInputsObj.meta.type[type].totalMin || 0;
+                  cb();
+                })
+                .catch(function (err) {
+                  return cb(err);
+                });
+            })
+            .catch(function (err) {
+              console.log(
+                chalkError(
+                  "GIS | LOAD HISTOGRAMS / GENERATE INPUT SETS ERROR: " + err
+                )
+              );
+              cb(err);
+            });
+        }
+      },
+      function (err) {
         if (err) {
           return reject(err);
         }
 
-        const histogramsUsedString = (globalInputsObj.meta.userProfileOnlyFlag) ? "profile" : "all";
+        const tableArray = [];
 
-        globalInputsObj.inputsId = configuration.inputsFilePrefix 
-          + "_" + moment().format(compactDateTimeFormat) 
-          + "_" + globalInputsObj.meta.numInputs 
-          + "_" + histogramsUsedString 
-          + "_" + hostname 
-          + "_" + process.pid;
+        tableArray.push([
+          "GIS |",
+          "TYPE",
+          "DOM MIN",
+          "TOT IN",
+          "TOT MIN",
+          "IN",
+          "GTOT IN",
+        ]);
 
+        globalInputsObj.meta.userProfileOnlyFlag =
+          configuration.userProfileOnlyFlag || false;
+        globalInputsObj.meta.numInputs = 0;
 
-        const networkInputsDoc = new global.wordAssoDb.NetworkInputs(globalInputsObj);
+        async.eachSeries(
+          inputTypes,
+          function (type, cb) {
+            if (globalInputsObj.meta.type[type] === undefined) {
+              return cb();
+            }
 
-        networkInputsDoc.save(async function(err, savedNetworkInputsDoc){
+            globalInputsObj.meta.numInputs +=
+              globalInputsObj.meta.type[type].numInputs;
 
-          if (err) {
-            console.log(chalkError("GIS | *** CREATE NETWORK INPUTS DB DOCUMENT: " + err));
-            return reject(err);
+            globalInputsObj.meta.type[type].minDominantMin =
+              globalInputsObj.meta.type[type].minDominantMin || 0;
+            globalInputsObj.meta.type[type].minTotalMin =
+              globalInputsObj.meta.type[type].minTotalMin || 0;
+
+            tableArray.push([
+              "GIS |",
+              type.toUpperCase(),
+              globalInputsObj.meta.type[type].minDominantMin.toFixed(8),
+              globalInputsObj.meta.type[type].totalInputs,
+              globalInputsObj.meta.type[type].minTotalMin,
+              globalInputsObj.meta.type[type].numInputs,
+              globalInputsObj.meta.numInputs,
+            ]);
+
+            cb();
+          },
+          function (err) {
+            if (err) {
+              return reject(err);
+            }
+
+            const histogramsUsedString = globalInputsObj.meta
+              .userProfileOnlyFlag
+              ? "profile"
+              : "all";
+
+            globalInputsObj.inputsId =
+              configuration.inputsFilePrefix +
+              "_" +
+              moment().format(compactDateTimeFormat) +
+              "_" +
+              globalInputsObj.meta.numInputs +
+              "_" +
+              histogramsUsedString +
+              "_" +
+              hostname +
+              "_" +
+              process.pid;
+
+            const networkInputsDoc = new global.wordAssoDb.NetworkInputs(
+              globalInputsObj
+            );
+
+            networkInputsDoc.save(async function (err, savedNetworkInputsDoc) {
+              if (err) {
+                console.log(
+                  chalkError(
+                    "GIS | *** CREATE NETWORK INPUTS DB DOCUMENT: " + err
+                  )
+                );
+                return reject(err);
+              }
+
+              printInputsObj(
+                "GIS | +++ SAVED NETWORK INPUTS DB DOCUMENT",
+                savedNetworkInputsDoc
+              );
+
+              console.log(
+                chalk.blue(
+                  "\nGIS | =========================================================================================" +
+                    "\nGIS | INPUTS | USER PROFILE ONLY: " +
+                    configuration.userProfileOnlyFlag +
+                    "\nGIS | -----------------------------------------------------------------------------------------\n" +
+                    table(tableArray, {
+                      align: ["l", "l", "r", "r", "r", "r", "r"],
+                    }) +
+                    "\nGIS | =========================================================================================\n"
+                )
+              );
+
+              const inFile = globalInputsObj.inputsId + ".json";
+
+              console.log(
+                chalkInfo(
+                  "GIS | ... SAVING INPUTS FILE: " + inFolder + "/" + inFile
+                )
+              );
+
+              await tcUtils.saveFile({
+                folder: inFolder,
+                file: inFile,
+                obj: globalInputsObj,
+              });
+
+              if (configuration.isDatabaseHost) {
+                console.log(
+                  chalkInfo(
+                    "GIS | ... UPDATING INPUTS CONFIG FILE: " +
+                      configDefaultFolder +
+                      "/" +
+                      defaultInputsConfigFile
+                  )
+                );
+
+                const networkInputsConfigObj = await tcUtils.loadFile({
+                  folder: configDefaultFolder,
+                  file: defaultInputsConfigFile,
+                  noErrorNotFound: true,
+                });
+
+                networkInputsConfigObj.INPUTS_IDS.push(
+                  globalInputsObj.inputsId
+                );
+                networkInputsConfigObj.INPUTS_IDS = _.uniq(
+                  networkInputsConfigObj.INPUTS_IDS
+                );
+
+                await tcUtils.saveFile({
+                  folder: configDefaultFolder,
+                  file: defaultInputsConfigFile,
+                  obj: networkInputsConfigObj,
+                });
+              }
+
+              let slackText = "\n*GIS | INPUTS*";
+              slackText = slackText + "\n" + globalInputsObj.inputsId;
+
+              await slackSendWebMessage({
+                channel: slackChannel,
+                text: slackText,
+              });
+
+              resolve();
+            });
           }
-
-          printInputsObj("GIS | +++ SAVED NETWORK INPUTS DB DOCUMENT", savedNetworkInputsDoc);
-
-          console.log(chalk.blue(
-              "\nGIS | ========================================================================================="
-            + "\nGIS | INPUTS | USER PROFILE ONLY: " + configuration.userProfileOnlyFlag 
-            + "\nGIS | -----------------------------------------------------------------------------------------\n"
-            + table(tableArray, { align: ["l", "l", "r", "r", "r", "r", "r"] })
-            + "\nGIS | =========================================================================================\n"
-          ));
-
-          const inFile = globalInputsObj.inputsId + ".json";
-
-          console.log(chalkInfo("GIS | ... SAVING INPUTS FILE: " + inFolder + "/" + inFile));
-
-          await tcUtils.saveFile({folder: inFolder, file: inFile, obj: globalInputsObj});
-
-          if (configuration.isDatabaseHost) {
-            console.log(chalkInfo("GIS | ... UPDATING INPUTS CONFIG FILE: " + configDefaultFolder + "/" + defaultInputsConfigFile));
-
-            const networkInputsConfigObj = await tcUtils.loadFile({folder: configDefaultFolder, file: defaultInputsConfigFile, noErrorNotFound: true });
-
-            networkInputsConfigObj.INPUTS_IDS.push(globalInputsObj.inputsId);
-            networkInputsConfigObj.INPUTS_IDS = _.uniq(networkInputsConfigObj.INPUTS_IDS);
-
-            await tcUtils.saveFile({folder: configDefaultFolder, file: defaultInputsConfigFile, obj: networkInputsConfigObj});
-          }
-
-          let slackText = "\n*GIS | INPUTS*";
-          slackText = slackText + "\n" + globalInputsObj.inputsId;
-
-          await slackSendWebMessage({channel: slackChannel, text: slackText});
-
-          resolve();
-
-        });
-
-      });  
-    });
-
+        );
+      }
+    );
   });
 }
 
-setTimeout(async function(){
-
+setTimeout(async function () {
   try {
-
     const cnf = await initConfig(configuration);
     configuration = deepcopy(cnf);
 
@@ -1615,51 +2086,63 @@ setTimeout(async function(){
       console.log(chalkAlert(MODULE_ID_PREFIX + " | TEST MODE"));
     }
 
-    console.log(chalkBlue(
-        "\n--------------------------------------------------------"
-      + "\n" + MODULE_ID_PREFIX + " | " + configuration.processName 
-      // + "\nCONFIGURATION\n" + jsonPrint(configuration)
-      + "\n--------------------------------------------------------"
-    ));
+    console.log(
+      chalkBlue(
+        "\n--------------------------------------------------------" +
+          "\n" +
+          MODULE_ID_PREFIX +
+          " | " +
+          configuration.processName +
+          // + "\nCONFIGURATION\n" + jsonPrint(configuration)
+          "\n--------------------------------------------------------"
+      )
+    );
 
-    global.dbConnection = await mgUtils.connectDb()
+    global.dbConnection = await mgUtils.connectDb();
 
-    if (configuration.testMode) { 
+    if (configuration.testMode) {
       inFolder += "_test";
     }
 
     if (configuration.generateUserProfileCharsCodesOnlyInputs) {
-      console.log(chalkAlert(
-          "\n--------------------------------------------------------"
-        + "\n" + MODULE_ID_PREFIX + " | GENERATING USER PROFILE CHAR CODES ONLY INPUTS"
-        + "\n--------------------------------------------------------"
-      ));
+      console.log(
+        chalkAlert(
+          "\n--------------------------------------------------------" +
+            "\n" +
+            MODULE_ID_PREFIX +
+            " | GENERATING USER PROFILE CHAR CODES ONLY INPUTS" +
+            "\n--------------------------------------------------------"
+        )
+      );
       await runUserProfileCharCodes();
       quit();
-    }
-    else if (configuration.generateBothUserProfileOnlyAndAllHistogramsInputs) {
-
-      console.log(chalkAlert(
-          "\n--------------------------------------------------------"
-        + "\n" + MODULE_ID_PREFIX + " | GENERATING BOTH USER PROFILE ONLY + ALL HISTOGRAMS INPUTS"
-        + "\n--------------------------------------------------------"
-      ));
+    } else if (
+      configuration.generateBothUserProfileOnlyAndAllHistogramsInputs
+    ) {
+      console.log(
+        chalkAlert(
+          "\n--------------------------------------------------------" +
+            "\n" +
+            MODULE_ID_PREFIX +
+            " | GENERATING BOTH USER PROFILE ONLY + ALL HISTOGRAMS INPUTS" +
+            "\n--------------------------------------------------------"
+        )
+      );
 
       configuration.userProfileOnlyFlag = true;
       await runMain();
       configuration.userProfileOnlyFlag = false;
       await runMain();
-    }
-    else{
+    } else {
       await runMain();
     }
     quit();
-
-  }
-  catch(err){
-    console.log(chalkError(MODULE_ID_PREFIX + " | **** INIT CONFIG ERROR *****\n", err));
+  } catch (err) {
+    console.log(
+      chalkError(MODULE_ID_PREFIX + " | **** INIT CONFIG ERROR *****\n", err)
+    );
     if (err.code !== 404) {
-      quit({cause: new Error("INIT CONFIG ERROR")});
+      quit({ cause: new Error("INIT CONFIG ERROR") });
     }
   }
 }, 1000);
