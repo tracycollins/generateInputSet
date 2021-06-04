@@ -1,4 +1,4 @@
-const dotenv = require("dotenv");
+import dotenv from "dotenv";
 const envConfig = dotenv.config({ path: process.env.WORD_ENV_VARS_FILE });
 
 if (envConfig.error) {
@@ -11,7 +11,9 @@ const DEFAULT_PRIMARY_HOST = "google";
 const DEFAULT_DATABASE_HOST = "mms3";
 const DEFAULT_RANDOM_SEED_FLAG = true;
 
-const os = require("os");
+import moment from "moment";
+import random from "random";
+import os from "os";
 
 let hostname = os.hostname();
 hostname = hostname.replace(/.local/g, "");
@@ -33,8 +35,8 @@ configuration.isDatabaseHost = hostname === configuration.databaseHost;
 const MAX_TEST_INPUTS = 10000;
 
 const MODULE_NAME = "generateInputSets";
-const MODULE_ID_PREFIX = "GIS";
-const MODULE_ID = MODULE_ID_PREFIX + "_node_" + hostname;
+const PF = "GIS";
+const MODULE_ID = PF + "_node_" + hostname;
 
 const DEFAULT_GENERATE_BOTH_USER_PROFILE_ONLY_AND_ALL_HISTOGRAMS_INPUTS = false;
 
@@ -94,17 +96,21 @@ configuration.verbose = DEFAULT_VERBOSE_MODE;
 
 configuration.inputsFilePrefix = DEFAULT_INPUTS_FILE_PREFIX;
 
-configuration.generateUserProfileCharsCodesOnlyInputs = DEFAULT_USER_PROFILE_CHAR_CODES_ONLY_FLAG;
+configuration.generateUserProfileCharsCodesOnlyInputs =
+  DEFAULT_USER_PROFILE_CHAR_CODES_ONLY_FLAG;
 
-configuration.generateBothUserProfileOnlyAndAllHistogramsInputs = DEFAULT_GENERATE_BOTH_USER_PROFILE_ONLY_AND_ALL_HISTOGRAMS_INPUTS;
+configuration.generateBothUserProfileOnlyAndAllHistogramsInputs =
+  DEFAULT_GENERATE_BOTH_USER_PROFILE_ONLY_AND_ALL_HISTOGRAMS_INPUTS;
 configuration.userDescriptionOnlyFlag = DEFAULT_USER_DESCRIPTION_ONLY_FLAG;
 configuration.userProfileOnlyFlag = DEFAULT_USER_PROFILE_ONLY_FLAG;
 configuration.testMode = GLOBAL_TEST_MODE;
 configuration.statsUpdateIntervalTime = STATS_UPDATE_INTERVAL;
 
 configuration.minTotalMin = DEFAULT_MIN_TOTAL_MIN;
-configuration.minTotalMinTweetsHashMap = DEFAULT_MIN_TOTAL_MIN_TWEETS_TYPE_HASHMAP;
-configuration.minTotalMinProfileHashMap = DEFAULT_MIN_TOTAL_MIN_PROFILE_TYPE_HASHMAP;
+configuration.minTotalMinTweetsHashMap =
+  DEFAULT_MIN_TOTAL_MIN_TWEETS_TYPE_HASHMAP;
+configuration.minTotalMinProfileHashMap =
+  DEFAULT_MIN_TOTAL_MIN_PROFILE_TYPE_HASHMAP;
 configuration.minDominantMin = DEFAULT_MIN_DOM_MIN;
 
 configuration.minInputsGenerated = DEFAULT_MIN_INPUTS_GENERATED;
@@ -115,23 +121,26 @@ configuration.maxNumInputsPerType = DEFAULT_MAX_NUM_INPUTS_PER_TYPE;
 configuration.keepaliveInterval = Number(ONE_MINUTE) + 1;
 configuration.quitOnComplete = true;
 
-global.wordAssoDb = require("@threeceelabs/mongoose-twitter");
+let mongooseDb;
+import mgt from "@threeceelabs/mongoose-twitter";
+global.wordAssoDb = mgt;
+global.dbConnection = false;
 
-const tcuChildName = MODULE_ID_PREFIX + "_TCU";
-const ThreeceeUtilities = require("@threeceelabs/threeceeutilities");
-const tcUtils = new ThreeceeUtilities(tcuChildName);
-
-const mguAppName = MODULE_ID_PREFIX + "_MGU";
-const MongooseUtilities = require("@threeceelabs/mongoose-utilities");
+const mguAppName = "MGU_" + MODULE_ID;
+import { MongooseUtilities } from "@threeceelabs/mongoose-utilities";
 const mgUtils = new MongooseUtilities(mguAppName);
 
 mgUtils.on("ready", async () => {
-  console.log(`${MODULE_ID_PREFIX} | +++ MONGOOSE UTILS READY: ${mguAppName}`);
-  statsObj.dbConnectionReady = true;
+  console.log(`${PF} | +++ MONGOOSE UTILS READY: ${mguAppName}`);
 });
 
-const moment = require("moment");
-const random = require("random");
+const tcuAppName = PF + "_TCU";
+import { ThreeceeUtilities } from "@threeceelabs/threeceeutilities";
+const tcUtils = new ThreeceeUtilities(tcuAppName);
+
+tcUtils.on("ready", async () => {
+  console.log(`${PF} | +++ THREECEE UTILS READY: ${tcuAppName}`);
+});
 
 let defaultConfiguration = {}; // general configuration for TFE
 let hostConfiguration = {}; // host-specific configuration for TFE
@@ -173,23 +182,23 @@ const compactDateTimeFormat = "YYYYMMDD_HHmmss";
 const INIT_DOM_MIN = 0.999999;
 const INIT_TOT_MIN = 100;
 
-const fs = require("fs");
-const JSONStream = require("JSONStream");
-const path = require("path");
-const merge = require("deepmerge");
-const util = require("util");
-const _ = require("lodash");
-const dot = require("dot-object");
-const defaults = require("object.defaults");
-const HashMap = require("hashmap").HashMap;
+import fs from "fs";
+import JSONStream from "JSONStream";
+import path from "path";
+import merge from "deepmerge";
+import util from "util";
+import _ from "lodash";
+import dot from "dot-object";
+import defaults from "object.defaults";
+import HashMap from "hashmap";
 
-const async = require("async");
-const debug = require("debug")("gis");
+import async from "async";
+import debug from "debug";
 
-const deepcopy = require("deep-copy");
-const table = require("text-table");
+import deepcopy from "deep-copy";
+import table from "text-table";
 
-const chalk = require("chalk");
+import chalk from "chalk";
 const chalkGreen = chalk.green;
 const chalkBlue = chalk.blue;
 // const chalkBlueBold = chalk.blue.bold;
@@ -238,7 +247,7 @@ const configHostFile =
 //=========================================================================
 // SLACK
 //=========================================================================
-const { WebClient } = require("@slack/web-api");
+import { WebClient } from "@slack/web-api";
 
 console.log("process.env.SLACK_BOT_TOKEN: ", process.env.SLACK_BOT_TOKEN);
 const slackBotToken = process.env.SLACK_BOT_TOKEN;
@@ -259,9 +268,7 @@ async function slackSendWebMessage(msgObj) {
       channel: channel,
     });
   } catch (err) {
-    console.log(
-      chalkAlert(MODULE_ID_PREFIX + " | *** slackSendWebMessage ERROR: " + err)
-    );
+    console.log(chalkAlert(PF + " | *** slackSendWebMessage ERROR: " + err));
     throw err;
   }
 }
@@ -383,7 +390,7 @@ let statsUpdateInterval;
 const jsonPrint = tcUtils.jsonPrint;
 const getTimeStamp = tcUtils.getTimeStamp;
 
-const cla = require("command-line-args");
+import cla from "command-line-args";
 
 const userProfileCharCodesOnlyFlag = {
   name: "userProfileCharCodesOnlyFlag",
@@ -776,7 +783,7 @@ function initStatsUpdate() {
   return new Promise(function (resolve) {
     console.log(
       chalkLog(
-        MODULE_ID_PREFIX +
+        PF +
           " | INIT STATS UPDATE INTERVAL | " +
           tcUtils.msToTime(configuration.statsUpdateIntervalTime)
       )
@@ -799,9 +806,7 @@ function initStatsUpdate() {
         });
         await showStats();
       } catch (err) {
-        console.log(
-          chalkError(MODULE_ID_PREFIX + " | *** SHOW STATS ERROR: " + err)
-        );
+        console.log(chalkError(PF + " | *** SHOW STATS ERROR: " + err));
       }
     }, configuration.statsUpdateIntervalTime);
 
@@ -858,7 +863,7 @@ function loadCommandLineArgs() {
         if (arg === "evolveIterations") {
           configuration.evolve.iterations = commandLineConfig[arg];
           console.log(
-            MODULE_ID_PREFIX +
+            PF +
               " | --> COMMAND LINE CONFIG | " +
               arg +
               ": " +
@@ -867,7 +872,7 @@ function loadCommandLineArgs() {
         } else {
           configuration[arg] = commandLineConfig[arg];
           console.log(
-            MODULE_ID_PREFIX +
+            PF +
               " | --> COMMAND LINE CONFIG | " +
               arg +
               ": " +
@@ -972,7 +977,7 @@ async function loadConfigFile(params) {
       if (params.noErrorNotFound) {
         console.log(
           chalkAlert(
-            MODULE_ID_PREFIX +
+            PF +
               " | ... SKIP LOAD CONFIG FILE: " +
               params.folder +
               "/" +
@@ -982,10 +987,7 @@ async function loadConfigFile(params) {
         return newConfiguration;
       } else {
         console.log(
-          chalkError(
-            MODULE_ID_PREFIX +
-              " | *** CONFIG LOAD FILE ERROR | JSON UNDEFINED ??? "
-          )
+          chalkError(PF + " | *** CONFIG LOAD FILE ERROR | JSON UNDEFINED ??? ")
         );
         throw new Error("JSON UNDEFINED");
       }
@@ -993,15 +995,13 @@ async function loadConfigFile(params) {
 
     if (loadedConfigObj instanceof Error) {
       console.log(
-        chalkError(
-          MODULE_ID_PREFIX + " | *** CONFIG LOAD FILE ERROR: " + loadedConfigObj
-        )
+        chalkError(PF + " | *** CONFIG LOAD FILE ERROR: " + loadedConfigObj)
       );
     }
 
     console.log(
       chalkInfo(
-        MODULE_ID_PREFIX +
+        PF +
           " | LOADED CONFIG FILE: " +
           params.file +
           "\n" +
@@ -1014,7 +1014,7 @@ async function loadConfigFile(params) {
       undefined
     ) {
       console.log(
-        MODULE_ID_PREFIX +
+        PF +
           " | LOADED GIS_GENERATE_BOTH_USER_PROFILE_ONLY_AND_ALL_HISTOGRAMS_INPUTS: " +
           loadedConfigObj.GIS_GENERATE_BOTH_USER_PROFILE_ONLY_AND_ALL_HISTOGRAMS_INPUTS
       );
@@ -1039,7 +1039,7 @@ async function loadConfigFile(params) {
 
     if (loadedConfigObj.GIS_USER_PROFILE_ONLY_FLAG !== undefined) {
       console.log(
-        MODULE_ID_PREFIX +
+        PF +
           " | LOADED GIS_USER_PROFILE_ONLY_FLAG: " +
           loadedConfigObj.GIS_USER_PROFILE_ONLY_FLAG
       );
@@ -1059,7 +1059,7 @@ async function loadConfigFile(params) {
 
     if (loadedConfigObj.GIS_RANDOM_SEED_FLAG !== undefined) {
       console.log(
-        MODULE_ID_PREFIX +
+        PF +
           " | LOADED GIS_RANDOM_SEED_FLAG: " +
           loadedConfigObj.GIS_RANDOM_SEED_FLAG
       );
@@ -1222,11 +1222,7 @@ async function loadConfigFile(params) {
   } catch (err) {
     console.error(
       chalkError(
-        MODULE_ID_PREFIX +
-          " | ERROR LOAD CONFIG: " +
-          fullPath +
-          "\n" +
-          jsonPrint(err)
+        PF + " | ERROR LOAD CONFIG: " + fullPath + "\n" + jsonPrint(err)
       )
     );
     throw err;
@@ -1245,7 +1241,7 @@ async function loadAllConfigFiles() {
     defaultConfiguration = defaultConfig;
     console.log(
       chalkInfo(
-        MODULE_ID_PREFIX +
+        PF +
           " | <<< LOADED DEFAULT CONFIG " +
           configDefaultFolder +
           "/" +
@@ -1264,7 +1260,7 @@ async function loadAllConfigFiles() {
     hostConfiguration = hostConfig;
     console.log(
       chalkInfo(
-        MODULE_ID_PREFIX +
+        PF +
           " | <<< LOADED HOST CONFIG " +
           configHostFolder +
           "/" +
@@ -1292,7 +1288,7 @@ async function loadAllConfigFiles() {
 async function initConfig(cnf) {
   statsObj.status = "INIT CONFIG";
 
-  console.log(chalkBlue(MODULE_ID_PREFIX + " | INIT CONFIG"));
+  console.log(chalkBlue(PF + " | INIT CONFIG"));
 
   if (debug.enabled) {
     console.log(
@@ -1323,7 +1319,7 @@ async function initConfig(cnf) {
     configArgs.forEach(function (arg) {
       if (_.isObject(configuration[arg])) {
         console.log(
-          MODULE_ID_PREFIX +
+          PF +
             " | _FINAL CONFIG | " +
             arg +
             "\n" +
@@ -1331,11 +1327,7 @@ async function initConfig(cnf) {
         );
       } else {
         console.log(
-          MODULE_ID_PREFIX +
-            " | _FINAL CONFIG | " +
-            arg +
-            ": " +
-            configuration[arg]
+          PF + " | _FINAL CONFIG | " + arg + ": " + configuration[arg]
         );
       }
     });
@@ -1350,9 +1342,7 @@ async function initConfig(cnf) {
 
     return configuration;
   } catch (err) {
-    console.log(
-      chalkError(MODULE_ID_PREFIX + " | *** CONFIG LOAD ERROR: " + err)
-    );
+    console.log(chalkError(PF + " | *** CONFIG LOAD ERROR: " + err));
     throw err;
   }
 }
@@ -1568,7 +1558,7 @@ function runUserProfileCharCodes() {
       chalkInfo(
         "\n--------------------------------------------------------" +
           "\n" +
-          MODULE_ID_PREFIX +
+          PF +
           " | USER PROFILE CHAR CODES ONLY" +
           "\n--------------------------------------------------------"
       )
@@ -1580,10 +1570,13 @@ function runUserProfileCharCodes() {
     globalInputsObj.meta.userProfileCharCodesOnlyFlag = true;
 
     globalInputsObj.meta.userProfileCharCounts = {};
-    globalInputsObj.meta.userProfileCharCounts.description = TWITTER_USER_DESCRIPTION_CHARS;
-    globalInputsObj.meta.userProfileCharCounts.location = TWITTER_USER_LOCATION_CHARS;
+    globalInputsObj.meta.userProfileCharCounts.description =
+      TWITTER_USER_DESCRIPTION_CHARS;
+    globalInputsObj.meta.userProfileCharCounts.location =
+      TWITTER_USER_LOCATION_CHARS;
     globalInputsObj.meta.userProfileCharCounts.name = TWITTER_USER_NAME_CHARS;
-    globalInputsObj.meta.userProfileCharCounts.screenName = TWITTER_USER_SCREENNAME_CHARS;
+    globalInputsObj.meta.userProfileCharCounts.screenName =
+      TWITTER_USER_SCREENNAME_CHARS;
 
     globalInputsObj.meta.numInputs =
       TWITTER_USER_DESCRIPTION_CHARS +
@@ -1611,7 +1604,7 @@ function runUserProfileCharCodes() {
     globalInputsObj.inputs = {};
 
     for (const userProfileProperty of userProfileProperties) {
-      // console.log(chalkInfo(MODULE_ID_PREFIX
+      // console.log(chalkInfo(PF
       //   + " | " + userProfileProperty.toUpperCase()
       //   + " | " + globalInputsObj.meta.userProfileCharCounts[userProfileProperty]
       // ));
@@ -1723,7 +1716,7 @@ function runMain() {
       chalkInfo(
         "\n--------------------------------------------------------" +
           "\n" +
-          MODULE_ID_PREFIX +
+          PF +
           " | USER PROFILE HISTOGRAM ONLY: " +
           configuration.userProfileOnlyFlag +
           "\n--------------------------------------------------------"
@@ -1734,7 +1727,7 @@ function runMain() {
       chalkInfo(
         "\n--------------------------------------------------------" +
           "\n" +
-          MODULE_ID_PREFIX +
+          PF +
           " | USER DESCRIPTION ONLY: " +
           configuration.userDescriptionOnlyFlag +
           "\n--------------------------------------------------------"
@@ -1759,7 +1752,7 @@ function runMain() {
 
       console.log(
         chalkLog(
-          MODULE_ID_PREFIX +
+          PF +
             " | RANDOM SEED: " +
             randomSeed.toFixed(3) +
             " | MIN DOM MIN: " +
@@ -2083,14 +2076,14 @@ setTimeout(async function () {
     initSlackWebClient();
 
     if (configuration.testMode) {
-      console.log(chalkAlert(MODULE_ID_PREFIX + " | TEST MODE"));
+      console.log(chalkAlert(PF + " | TEST MODE"));
     }
 
     console.log(
       chalkBlue(
         "\n--------------------------------------------------------" +
           "\n" +
-          MODULE_ID_PREFIX +
+          PF +
           " | " +
           configuration.processName +
           // + "\nCONFIGURATION\n" + jsonPrint(configuration)
@@ -2109,7 +2102,7 @@ setTimeout(async function () {
         chalkAlert(
           "\n--------------------------------------------------------" +
             "\n" +
-            MODULE_ID_PREFIX +
+            PF +
             " | GENERATING USER PROFILE CHAR CODES ONLY INPUTS" +
             "\n--------------------------------------------------------"
         )
@@ -2123,7 +2116,7 @@ setTimeout(async function () {
         chalkAlert(
           "\n--------------------------------------------------------" +
             "\n" +
-            MODULE_ID_PREFIX +
+            PF +
             " | GENERATING BOTH USER PROFILE ONLY + ALL HISTOGRAMS INPUTS" +
             "\n--------------------------------------------------------"
         )
@@ -2138,9 +2131,7 @@ setTimeout(async function () {
     }
     quit();
   } catch (err) {
-    console.log(
-      chalkError(MODULE_ID_PREFIX + " | **** INIT CONFIG ERROR *****\n", err)
-    );
+    console.log(chalkError(PF + " | **** INIT CONFIG ERROR *****\n", err));
     if (err.code !== 404) {
       quit({ cause: new Error("INIT CONFIG ERROR") });
     }
