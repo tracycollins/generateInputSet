@@ -23,9 +23,9 @@
     chalk "^2.0.0"
     js-tokens "^4.0.0"
 
-"@google-cloud/language@^4.2.6":
+"@google-cloud/language@^4.2.8":
   version "4.2.8"
-  resolved "https://registry.yarnpkg.com/@google-cloud/language/-/language-4.2.8.tgz#b1dcf3c82108d58edc85af7898f1c1d0398acbb6"
+  resolved "https://registry.npmjs.org/@google-cloud/language/-/language-4.2.8.tgz#b1dcf3c82108d58edc85af7898f1c1d0398acbb6"
   integrity sha512-sWCZr8u/IwHl1NwlQtKmtQhafZvJm+gx5e1BOEFhk1LCC05hwVALagmU+ZOLcj13tt74Ay/dMGxK2cJzOdpraA==
   dependencies:
     google-gax "^2.17.1"
@@ -232,15 +232,15 @@
     eventemitter3 "^4.0.7"
     treeify "^1.1.0"
 
-"@threeceelabs/threeceeutilities@^5.2.9":
-  version "5.2.9"
-  resolved "https://registry.yarnpkg.com/@threeceelabs/threeceeutilities/-/threeceeutilities-5.2.9.tgz#1f4ee24cb3d150a162793beb403632fc91bf94a5"
-  integrity sha512-YzPV+QxIM/+6Pkw9c5YsZrZ2qCxuNGGN5ZNoZxuQVQxqCCALmVria/zwtMRU+0DFndkRT4EcNxdYWlgNUcRXkg==
+"@threeceelabs/threeceeutilities@^5.2.19":
+  version "5.2.19"
+  resolved "https://registry.npmjs.org/@threeceelabs/threeceeutilities/-/threeceeutilities-5.2.19.tgz#4085c57843e63b1d6a21d6e9ae1345803f03a7cf"
+  integrity sha512-lHozCozD8/XY9Lw7EEqmjZsyMqPZ7ZyADQx6hMW/4AAy2RzrNDfn/DkMsZ9dTAfEEcWT5k6gLbKKcAzgnid8bQ==
   dependencies:
-    "@google-cloud/language" "^4.2.6"
+    "@google-cloud/language" "^4.2.8"
     "@googlemaps/google-maps-services-js" "^3.1.16"
     "@threeceelabs/mongoose-twitter" "^2.0.1"
-    "@threeceelabs/twitter-image-parser" "^2.1.1"
+    "@threeceelabs/twitter-image-parser" "^2.1.2"
     "@threeceelabs/twitter-text-parser" "^2.1.4"
     async "^3.2.0"
     atob "^2.1.2"
@@ -265,13 +265,13 @@
     retry "^0.13.1"
     treeify "^1.1.0"
     twit "^2.2.11"
-    url-parse "^1.5.1"
+    url-parse "^1.5.3"
     write-json-file "^4.3.0"
 
-"@threeceelabs/twitter-image-parser@^2.1.1":
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/@threeceelabs/twitter-image-parser/-/twitter-image-parser-2.1.1.tgz#cb050907ef5ee61ca85984fecf9485919045f100"
-  integrity sha512-RxxAhz3JDtu4pOHkaMwXpfROUW7Q7VjKzO16oVrcoZsehHQaV7NF2o/SELzc9kG7jL2hwbFNmj9ZesbIA8547g==
+"@threeceelabs/twitter-image-parser@^2.1.2":
+  version "2.1.2"
+  resolved "https://registry.npmjs.org/@threeceelabs/twitter-image-parser/-/twitter-image-parser-2.1.2.tgz#6f3bf39da1033388040c4cc4d82ff7c6a67cd115"
+  integrity sha512-3XSysTjyETkcjXbm4wSudM/xVvBm8KA7/H6/WIWFtcpphtIhlyMntMQTqahS9T1+RxhlcTQhfwea4SVaGIU+Zg==
   dependencies:
     "@google-cloud/vision" "^2.3.5"
     "@threeceelabs/mergehistograms" "^1.1.3"
@@ -596,6 +596,14 @@ chalk@^4.1.1:
     ansi-styles "^4.1.0"
     supports-color "^7.1.0"
 
+chalk@^4.1.2:
+  version "4.1.2"
+  resolved "https://registry.npmjs.org/chalk/-/chalk-4.1.2.tgz#aac4e2b7734a740867aeb16bf02aad556a1e7a01"
+  integrity sha512-oKnbhFyRIXpUuez8iBMmyEa4nbj4IOQyuhc/wy9kY7/WVPcwIO9VA668Pu8RkO7+0G76SLROeyw9CpQ061i4mA==
+  dependencies:
+    ansi-styles "^4.1.0"
+    supports-color "^7.1.0"
+
 clean-text-utils@^1.1.17:
   version "1.1.17"
   resolved "https://registry.yarnpkg.com/clean-text-utils/-/clean-text-utils-1.1.17.tgz#ea7a0fc4104e78d058f23e47b2b19e2244d4f3b7"
@@ -646,10 +654,10 @@ combined-stream@^1.0.6, combined-stream@~1.0.6:
   dependencies:
     delayed-stream "~1.0.0"
 
-command-line-args@^5.1.3:
-  version "5.1.3"
-  resolved "https://registry.yarnpkg.com/command-line-args/-/command-line-args-5.1.3.tgz#1e57d2816f28804073bb5e75cd24e02e2aa321e7"
-  integrity sha512-a5tF6mjqRSOBswBwdMkKY47JQ464Dkg9Pcwbxwo9wxRhKWZjtBktmBASllk3AMJ7qBuWgsAGtVa7b2/+EsymOQ==
+command-line-args@^5.2.0:
+  version "5.2.0"
+  resolved "https://registry.npmjs.org/command-line-args/-/command-line-args-5.2.0.tgz#087b02748272169741f1fd7c785b295df079b9be"
+  integrity sha512-4zqtU1hYsSJzcJBOcNZIbW5Fbk9BkjCp1pZVhQKoRaWL5J7N4XphDLwo8aWwdQpTugxwu+jf9u2ZhkXiqp5Z6A==
   dependencies:
     array-back "^3.1.0"
     find-replace "^3.0.0"
@@ -2196,9 +2204,9 @@ uri-js@^4.2.2:
   dependencies:
     punycode "^2.1.0"
 
-url-parse@^1.5.1:
+url-parse@^1.5.3:
   version "1.5.3"
-  resolved "https://registry.yarnpkg.com/url-parse/-/url-parse-1.5.3.tgz#71c1303d38fb6639ade183c2992c8cc0686df862"
+  resolved "https://registry.npmjs.org/url-parse/-/url-parse-1.5.3.tgz#71c1303d38fb6639ade183c2992c8cc0686df862"
   integrity sha512-IIORyIQD9rvj0A4CLWsHkBBJuNqWpFQe224b6j9t/ABmquIS0qDU2pY6kl6AuOrL5OkCXHMCFNe1jBcuAggjvQ==
   dependencies:
     querystringify "^2.1.1"
